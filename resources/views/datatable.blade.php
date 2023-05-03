@@ -275,7 +275,7 @@
         ***********************************-->
         <div class="footer">
             <div class="copyright">
-                <p>Copyright © Designed &copy; Developed by <a href="../index.html" target="_blank">Boyoka</a> 2023</p>
+                <p>Copyright © Designed &copy; Developed by <a href="../index.html" target="_blank">Manfaily roland yao</a> 2023</p>
             </div>
         </div>
         <!--**********************************
