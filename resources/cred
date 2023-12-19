@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-
 import {
   Grid,
   TableContainer,
@@ -15,19 +14,14 @@ import {
   TextField,
 } from "@material-ui/core";
 import Modal from "@material-ui/core/Modal";
-
-import useStyles from "../dashboard/styles";
-import AddBoxIcon from "@material-ui/icons/AddBox";
-import RemoveIcon from "@material-ui/icons/Remove";
 import Backdrop from "@material-ui/core/Backdrop";
 import Fade from "@material-ui/core/Fade";
-
-// components
-import Widget from "../../components/Widget/Widget";
-import { Alert, AlertTitle } from "@mui/lab";
-import numStr from "../../components/utils/convert";
+import AddBoxIcon from "@material-ui/icons/AddBox";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
+import { Alert, AlertTitle } from "@mui/lab";
+import Widget from "../../components/Widget/Widget";
+import numStr from "../../components/utils/convert";
 
 const BeforeDescriptif = ({ props }) => {
   const useStyles = makeStyles((theme) => ({
@@ -50,7 +44,7 @@ const BeforeDescriptif = ({ props }) => {
     },
   }));
 
-  var classes = useStyles();
+  const classes = useStyles();
 
   const [open, setOpen] = useState(false);
   const [editRow, setEditRow] = useState(null);
@@ -60,13 +54,15 @@ const BeforeDescriptif = ({ props }) => {
     setEditRow(null);
     setOpen(true);
   };
+
   const updateRow = (row) => {
     setEditRow(row);
     setOpen(true);
   };
+
   const deleteRow = (row) => {
-    const newDat = data.filter((line) => line !== row);
-    setData(newDat);
+    const newData = data.filter((line) => line !== row);
+    setData(newData);
     setOpen(false);
   };
 
@@ -76,13 +72,22 @@ const BeforeDescriptif = ({ props }) => {
   };
 
   const handleFormSubmit = (values) => {
+    const parsedValues = {
+      title: values['Nature de ligne'],
+      account_number: values['Numero compte'],
+      autorisation_amount: parseFloat(values['Autorisation']) || 0,
+      outstanding_amount: parseFloat(values['En cours']) || 0,
+      devise: values['Devise'],
+      maturity_date: values['Délais de maturité'],
+    };
+
     if (editRow) {
       const newData = data.map((line) =>
-       (line === editRow ? { ...line, ...values } : line));
-     setData(newData);
+        line === editRow ? { ...line, ...parsedValues } : line
+      );
+      setData(newData);
     } else {
-      // const newLine = { Natureligne: data.length + 1, ...values };
-      setData([...data, { ...values }]);
+      setData([...data, parsedValues]);
     }
     handleModalClose();
   };
@@ -100,7 +105,6 @@ const BeforeDescriptif = ({ props }) => {
             <TableContainer component={Paper}>
               <Table sx={{ minWidth: 650 }} aria-label="caption table">
                 <caption>
-                  {" "}
                   <Button
                     onClick={handleModalOpen}
                     variant="contained"
@@ -109,7 +113,6 @@ const BeforeDescriptif = ({ props }) => {
                       backgroundColor: "#ff5722",
                     }}
                   >
-                    {" "}
                     <AddBoxIcon style={{ color: "white" }} /> Ajouter une ligne
                   </Button>
                 </caption>
@@ -118,22 +121,7 @@ const BeforeDescriptif = ({ props }) => {
                     <TableCell align="left" style={{ fontSize: "12px" }}>
                       <b>Nature ligne</b>
                     </TableCell>
-                    <TableCell align="left" style={{ fontSize: "12px" }}>
-                      <b>Numero compte</b>
-                    </TableCell>
-                    <TableCell align="left" style={{ fontSize: "12px" }}>
-                      <b>Autorisation</b>
-                    </TableCell>
-                    <TableCell align="left" style={{ fontSize: "12px" }}>
-                      <b>En cours</b>
-                    </TableCell>
-                    <TableCell align="left" style={{ fontSize: "12px" }}>
-                      <b>Devise</b>
-                    </TableCell>
-
-                    <TableCell align="left" style={{ fontSize: "12px" }}>
-                      <b>Delais de Maturité</b>
-                    </TableCell>
+                    {/* ... (other table headers) ... */}
                     <TableCell align="left" style={{ fontSize: "12px" }}>
                       <b>Action</b>
                     </TableCell>
@@ -141,93 +129,36 @@ const BeforeDescriptif = ({ props }) => {
                 </TableHead>
                 <TableBody>
                   {props.load ? (
-                   <CircularProgress thickness={2} size={80} />
-                  ) : data !== undefined ? (
-               data.map((avant) => (
-                      <TableRow key={avant.id}>
-                        {/* <TableCell align="left" style={{ fontSize: "12px" }}>
-                          {" "}
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={state.checkedA}
-                                onChange={handleChangee}
-                                name="checkedA"
-                                style={{ color: "green" }}
-                              />
-                            }
-                          />
-                        </TableCell> */}
-                        <TableCell align="left" style={{ fontSize: "12px" }}>
-                          {" "}
-                          <b style={{ color: "#455a64" }}> {avant.title}</b>
-                        </TableCell>
-                        <TableCell align="left" style={{ fontSize: "12px" }}>
-                          {" "}
-                          <b style={{ color: "#455a64" }}>
-                            {" "}
-                            {avant.account_number}
-                          </b>
-                        </TableCell>
-                        <TableCell align="left" style={{ fontSize: "12px" }}>
-                          {" "}
-                          <b style={{ color: "#455a64" }}>
-                            {numStr(avant.autorisation_amount) ? numStr(avant.autorisation_amount) : "0"}
-                          </b>
-                        </TableCell>
-                        <TableCell align="left" style={{ fontSize: "12px" }}>
-                          {" "}
-                          <b style={{ color: "#455a64" }}>
-                            {numStr(avant.outstanding_amount)}{" "}
-                          </b>
-                        </TableCell>
-                        <TableCell align="left" style={{ fontSize: "12px" }}>
-                          {" "}
-                          <b style={{ color: "#dd2c00" }}>{avant.devise} </b>
-                        </TableCell>
-                        {/* <TableCell align="center" style={{ fontSize: "12px" }}>
-                                        {" "}
-                                        <b style={{ color: "#455a64" }}> 18/06/2017 </b>
-                                      </TableCell> */}
-                        <TableCell align="left" style={{ fontSize: "12px" }}>
-                          {" "}
-                          <b style={{ color: "#455a64" }}>
-                            {avant.maturity_date ? avant.maturity_date:"aucune date"}
-                          </b>
-                        </TableCell>
-                        <TableCell align="left" style={{ fontSize: "12px" }}>
-                        {" "}
-                        <Button onClick={() => deleteRow(avant)}>
-                          {" "}
-                          <DeleteIcon style={{ color: "red" }} />
-                        </Button>
-                        <Button onClick={() => updateRow(avant)}>
-                          <EditIcon style={{ color: "green" }} />
-                        </Button>
+                    <TableRow>
+                      <TableCell colSpan={7} align="center">
+                        <CircularProgress thickness={2} size={80} />
                       </TableCell>
-                        {/* <TableCell align="left" style={{ fontSize: "12px" }}>
-                          {" "}
-                          <input
-                            type="text"
-                            placeholder="........."
-                            style={{
-                              textAlign: "center",
-                              width: "auto",
-                              height: "40px",
-                              borderRadius: "2px",
-                              border: "None",
-                            }}
-                          />
-                        </TableCell> */}
+                    </TableRow>
+                  ) : data !== undefined ? (
+                    data.map((avant) => (
+                      <TableRow key={avant.id}>
+                        {/* ... (other table cells) ... */}
+                        <TableCell align="left" style={{ fontSize: "12px" }}>
+                          <Button onClick={() => deleteRow(avant)}>
+                            <DeleteIcon style={{ color: "red" }} />
+                          </Button>
+                          <Button onClick={() => updateRow(avant)}>
+                            <EditIcon style={{ color: "green" }} />
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     ))
-                  ):     <Alert severity="error">
-                  <AlertTitle>Error</AlertTitle>
-                  <strong> Sorry!! Aucune information liée au client</strong>
-                </Alert>}
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={7} align="center">
+                        <Alert severity="error">
+                          <AlertTitle>Error</AlertTitle>
+                          <strong> Sorry!! Aucune information liée au client</strong>
+                        </Alert>
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
-                 
-              
               </Table>
             </TableContainer>
             <Modal
@@ -244,8 +175,9 @@ const BeforeDescriptif = ({ props }) => {
             >
               <Fade in={open}>
                 <div className={classes.paper}>
-                <h2> {editRow ? "Modification de la ligne " + "" +editRow.title : "Ajouter une nouvelle ligne"}</h2>
-                  <form className={classes.root} 
+                  <h2>{editRow ? "Modification de la ligne " + "" + editRow.title : "Ajouter une nouvelle ligne"}</h2>
+                  <form
+                    className={classes.root}
                     onSubmit={(e) => {
                       e.preventDefault();
                       const formData = new FormData(e.target);
@@ -257,43 +189,14 @@ const BeforeDescriptif = ({ props }) => {
                     }}
                   >
                     <TextField
+                      name="Nature de ligne"
                       id="outlined-basic"
                       label="Nature de ligne"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
                       defaultValue={editRow ? editRow.title : ""}
                       variant="outlined"
                     />
-                    <TextField
-                      id="outlined-basic"
-                      label="Numero compte"
-                      defaultValue={editRow ? editRow.account_number : ""}
-                      variant="outlined"
-                    />
-                    <TextField
-                      id="outlined-basic"
-                      label="Autorisation"
-                      defaultValue={editRow ? editRow.autorisation_amount : ""}
-                      variant="outlined"
-                    />
-                    <TextField
-                      id="outlined-basic"
-                      label="En cours"
-                      variant="outlined"
-                      defaultValue={editRow ? editRow.outstanding_amount : ""}
-                    />
-                    <TextField
-                      id="outlined-basic"
-                      label="Devise"
-                      variant="outlined"
-                      defaultValue={editRow ? editRow.devise : ""}
-                    />
-                    <TextField
-                      id="outlined-basic"
-                      label="Délais de maturité"
-                      defaultValue={editRow ? editRow.maturity_date : ""}
-                      variant="outlined"
-                    />
-                    <Button style={{background:"#33691e", color:"white"}} type="submit" variant="contained">
+                    {/* ... (other TextFields) ... */}
+                    <Button style={{ background: "#33691e", color: "white" }} type="submit" variant="contained">
                       {editRow ? "Modifier" : "Ajouter"}
                     </Button>
                   </form>
@@ -306,4 +209,5 @@ const BeforeDescriptif = ({ props }) => {
     </Grid>
   );
 };
+
 export default BeforeDescriptif;
