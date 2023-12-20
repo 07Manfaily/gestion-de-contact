@@ -668,3 +668,526 @@ class Graph_chaine extends Component {
 }
 
 export default withAuth() (Graph_chaine);
+
+
+{
+  "data": [
+    {
+      "data": {
+        "rows": [
+          {
+            "CLI_Emet": 116317874,
+            "CLI_S": 711999992,
+            "perc_emet": 0.035864197026549416,
+            "perc_recep": 0.011497036090731555,
+            "CLI_Emet_Provi_Stage_Code": 3,
+            "CLI_S_Provi_Stage_Code": 1,
+            "Montant": 131650
+          },
+          {
+            "CLI_Emet": 500480335,
+            "CLI_S": 711999992,
+            "perc_emet": 0.03326606822265643,
+            "perc_recep": 0.011837624322815514,
+            "CLI_Emet_Provi_Stage_Code": 1,
+            "CLI_S_Provi_Stage_Code": 1,
+            "Montant": 135550
+          },
+          {
+            "CLI_Emet": 500492210,
+            "CLI_S": 711999992,
+            "perc_emet": 0.015770263462295743,
+            "perc_recep": 0.011986085859877751,
+            "CLI_Emet_Provi_Stage_Code": 2,
+            "CLI_S_Provi_Stage_Code": 1,
+            "Montant": 137250
+          },
+          {
+            "CLI_Emet": 500014573,
+            "CLI_S": 711999992,
+            "perc_emet": 0.13989847092844693,
+            "perc_recep": 0.0121083483021643,
+            "CLI_Emet_Provi_Stage_Code": 1,
+            "CLI_S_Provi_Stage_Code": 1,
+            "Montant": 138650
+          },
+          {
+            "id": "500632301",
+            "label": "SOCIETE CIVILE IMMOBILIERE FIRST",
+            "color": "#0b7a46",
+            "shape": "dot",
+            "size": 10,
+            "x": 722.195703417157,
+            "y": 294.53445710022464,
+            "group": 7
+          },
+          {
+            "id": "500622745",
+            "label": "IVOIRE SIGNALISATIONS ET TRAVAUX DIVERS",
+            "color": "#0b7a46",
+            "shape": "dot",
+            "size": 10,
+            "x": 618.4029229119365,
+            "y": 777.0593932051363,
+            "group": 8
+          },
+          {
+            "id": "500207834",
+            "label": "COTE D'IVOIRE ENERGIES",
+            "color": "#0b7a46",
+            "shape": "dot",
+            "size": 10,
+            "title": "Encours : 63.832.182.735",
+            "x": 177.3270676986634,
+            "y": 288.98925508626724,
+            "group": 9
+          },
+          {
+            "id": "500356829",
+            "label": "SOCIETE IVOIRIENNE DE PACKAGING",
+            "color": "#0b7a46",
+            "shape": "dot",
+            "size": 10,
+            "title": "Encours : 1.289.509.989",
+            "x": 299.5050501517114,
+            "y": 727.0519384323874,
+            "group": 10
+          },
+          {
+            "id": "500476596",
+            "label": "PHAMAM BROKER COTE D'IVOIRE",
+            "color": "#0b7a46",
+            "shape": "dot",
+            "size": 10,
+            "title": "Encours : 16.062.676",
+            "x": 268.38750531148753,
+            "y": 524.5632529810385,
+            "group": 11
+          },
+          {
+            "id": "500404313",
+            "label": "VILLEBRUN AYMERIC MARIE GHISLAIN OU WAGNER EPSE VILLEBRUN ELISA",
+            "color": "#0b7a46",
+            "shape": "dot",
+            "size": 10,
+            "x": 285.0997780374251,
+            "y": 440.7617571072356,
+            "group": 12
+          },
+          {
+            "id": "500605600",
+            "label": "JEBEILI AND COMPANY",
+            "color": "#0b7a46",
+            "shape": "dot",
+            "size": 10,
+            "title": "Encours : 511.500.000",
+            "x": 930.6649584734232,
+            "y": 677.6252206625489,
+            "group": 13
+          },
+          {
+            "id": "500014573",
+            "label": "NLLE AFRIQUE INDUSTRIE",
+            "color": "#0b7a46",
+            "shape": "dot",
+            "size": 10,
+            "x": 72.26366670906877,
+            "y": 225.23626977920512,
+            "group": 14
+          },
+          {
+            "id": "500492210",
+            "label": "ANAÏSA",
+            "color": "orange",
+            "shape": "dot",
+            "size": 10,
+            "title": "Encours : 52.577.983",
+            "x": 541.683633845607,
+            "y": 260.7945458823788,
+            "group": 15
+          },
+          {
+            "id": "500480335",
+            "label": "ARTEMIS CONSTRUCTION ET TRAVAUX",
+            "color": "#0b7a46",
+            "shape": "dot",
+            "size": 10,
+            "title": "Encours : 28.316.572",
+            "x": 457.90110148618567,
+            "y": 630.6739315965252,
+            "group": 16
+          },
+          {
+            "id": "500018100",
+            "label": "AFRICAN DISTRIBUTION COMPANY",
+            "color": "#0b7a46",
+            "shape": "dot",
+            "size": 10,
+            "title": "Encours : 1.838.629.923",
+            "x": 276.7012037661284,
+            "y": 443.4691505703173,
+            "group": 17
+          },
+          {
+            "id": "500360085",
+            "label": "INGENIERIE INDUSTRIELLE ET PETROLIERE",
+            "color": "#0b7a46",
+            "shape": "dot",
+            "size": 10,
+            "x": 659.5310258241133,
+            "y": 252.55817755050123,
+            "group": 18
+          },
+          {
+            "id": "116317874",
+            "label": "SHELEC",
+            "color": "red",
+            "shape": "dot",
+            "size": 10,
+            "title": "Encours : 242.936.251",
+            "x": 917.7132107661479,
+            "y": 149.15510345525635,
+            "group": 19
+          },
+          {
+            "id": "711999992",
+            "label": "CHEQUES A PAYER",
+            "color": "#036ca7",
+            "shape": "dot",
+            "size": 10,
+            "x": 429.3578743290622,
+            "y": 131.71270020023996,
+            "group": 0
+          }
+        ],
+        "color": {
+          "111002093": "#0b7a46",
+          "111272112": "#0b7a46",
+          "111305422": "#0b7a46",
+          "111692001": "#0b7a46",
+          "111832203": "#0b7a46",
+          "116303511": "#0b7a46",
+          "116304377": "#0b7a46",
+          "116317874": "red",
+          "116331696": "#0b7a46",
+          "119340949": "#0b7a46",
+          "119341196": "#0b7a46",
+          "431300252": "#0b7a46",
+          "500014573": "#0b7a46",
+          "500018100": "#0b7a46",
+          "500019385": "#0b7a46",
+          "500033964": "#0b7a46",
+          "500041289": "#0b7a46",
+          "500041903": "orange",
+          "500042135": "#0b7a46",
+          "500072575": "orange",
+          "500090835": "#0b7a46",
+          "500133912": "#0b7a46",
+          "500169259": "red",
+          "500183251": "#0b7a46",
+          "500189104": "#0b7a46",
+          "500193864": "red",
+          "500207834": "#0b7a46",
+          "500209389": "#0b7a46",
+          "500222879": "red",
+          "500229767": "#0b7a46",
+          "500375126": "#0b7a46",
+          "500401100": "#0b7a46",
+          "500404313": "#0b7a46",
+          "500423790": "#0b7a46",
+          "500437851": "#0b7a46",
+          "500444270": "#0b7a46",
+          "500444456": "#0b7a46",
+          "500449045": "red",
+          "500452875": "#0b7a46",
+          "500454016": "#0b7a46",
+          "500465820": "#0b7a46",
+          "500466027": "#0b7a46",
+          "500474017": "#0b7a46",
+          "500476596": "#0b7a46",
+          "500480335": "#0b7a46",
+          "500480727": "#0b7a46",
+          "500492210": "orange",
+          "500501721": "red",
+          "500522770": "orange",
+          "500524798": "#0b7a46",
+          "500526231": "#0b7a46",
+          "500545084": "#0b7a46",
+          "500547109": "#0b7a46",
+          "500549798": "#0b7a46",
+          "500554070": "#0b7a46",
+          "500561508": "#0b7a46",
+          "500576449": "#0b7a46",
+          "500583552": "#0b7a46",
+          "500600329": "red",
+          "500605590": "red",
+          "500605600": "#0b7a46",
+          "500606382": "#0b7a46",
+          "500610265": "red",
+          "500617503": "#0b7a46",
+          "500619115": "#0b7a46",
+          "500622745": "#0b7a46",
+          "500626419": "#0b7a46",
+          "500631903": "#0b7a46",
+          "500632301": "#0b7a46",
+          "500636495": "#0b7a46",
+          "500638843": "red",
+          "500639879": "red",
+          "500641392": "red",
+          "500650988": "#0b7a46",
+          "500657821": "#0b7a46",
+          "500670230": "#0b7a46",
+          "500674594": "#0b7a46",
+          "500688816": "#0b7a46",
+          "711000020": "#0b7a46",
+          "711000068": "#0b7a46",
+          "711999992": "#036ca7"
+        },
+        "label": {
+          "111002093": "SOCIETE GENERALE CAPITAL SECURITIES",
+          "111272112": "DIVERSES VALEURS RECUES DF",
+          "111305422": "ALLIANZ COTE D'IVOIRE ASSURANCES",
+          "111692001": "POLICE NATIONALE",
+          "111832203": "SOCIÉTÉ GÉNÉRALE CAPITAL ASSET MANAGEMENT WEST AFRICA",
+          "116303511": "ALL-GRO",
+          "116304377": "SOGELUX",
+          "116317874": "SHELEC",
+          "116331696": "RIMCO-SETACI",
+          "119340949": "ADAM AFRIQUE",
+          "119341196": "CIMA CENTRE D'IMAGERIE MEDICALE ABI",
+          "431300252": "S I P E F CI",
+          "500014573": "NLLE AFRIQUE INDUSTRIE",
+          "500018100": "AFRICAN DISTRIBUTION COMPANY",
+          "500019385": "COCOA EXPORT COTE D'IVOIRE",
+          "500033964": "SPA-IMPEX/CI",
+          "500041289": "ETEIFA EXPERTISES",
+          "500041903": "GROUPE EKM",
+          "500042135": "CENTRALE D'ACHAT DE PRODUITS AGRICOLES",
+          "500072575": "ICM NAUTICAL",
+          "500090835": "SOCIETE GENERALE COTE D'IVOIRE",
+          "500133912": "DIVERS VIREMENTS RECUS",
+          "500169259": "SOCIETE DE DISTRIBUTION  ET DE TRAVAUX",
+          "500183251": "IMPROCI",
+          "500189104": "FABRICATION IVOIRIENNE DE PLASTIQUE",
+          "500193864": "LES TERRES DU SUD",
+          "500207834": "COTE D'IVOIRE ENERGIES",
+          "500209389": "FLEXIBLE PACKAGING COTE D'IVOIRE",
+          "500222879": "CARTE D'OR COTE D'IVOIRE",
+          "500229767": "VERGERS DU BANDAMA",
+          "500250510": "QUANG THIEN IMEX",
+          "500261459": "DATA TECHNOLOGIE",
+          "500265955": "AGBAOU GOLD OPERATIONS",
+          "500274235": "SOCIETE DE DISTRIBUTION DE PRODUITS ALIMENTAIRES",
+          "500279146": "COTE D'IVOIRE COMMERCE IMPRIMERIE ET TRANSIT",
+          "500289072": "SOCIETE AFRICAINE DE PETROLE ET D'HYDROCABURE RAFFINES",
+          "500293570": "CABINET ELITES SARL",
+          "500308741": "FANAN & MAMADOU GENERAL SERVICES",
+          "500319460": "SOCIETE D'USINAGE, DE TRANSFORMATION ET D'EXPORTATION DE CAFE-CACAO",
+          "500323667": "SOCIETE DES PLANTEURS DE DJIBOUA",
+          "500323766": "EKYL SARL",
+          "500346796": "SAFFRON ELECTRONICS",
+          "500353676": "LIKA",
+          "500356614": "BERECAPHARMA",
+          "500356829": "SOCIETE IVOIRIENNE DE PACKAGING",
+  
+          "500401100": "LASSIRE INDUSTRIE",
+          "500404313": "VILLEBRUN AYMERIC MARIE GHISLAIN OU WAGNER EPSE VILLEBRUN ELISA",
+          "500423790": "SOCIETE GENERALE AFRIQUE DE L'OUEST",
+          "500437851": "SCOOPS-IPH",
+          "500444270": "STE TRANSAKO",
+          "500444456": "COMPAGNIE CACAOYERE DU BANDAMA",
+          "500449045": "SANATA DISTRIBUTION",
+          "500452875": "MULTIPACK",
+          "500454016": "SOCIETE COOPERATIVE AGRICOLE POUR LE DEVELOPPEMENT DE SASSANDRA",
+          "500465820": "SAFECHAF",
+          "500466027": "IVOIRE TRANSPORT",
+          "500474017": "IVORY COCOA PRODUCTS",
+          "500476596": "PHAMAM BROKER COTE D'IVOIRE",
+          "500480335": "ARTEMIS CONSTRUCTION ET TRAVAUX",
+          "500480727": "COMITE D'ENTREPRISE SOCIETE GENERALE COTE D'IVOIRE",
+          "500492210": "ANAÏSA",
+          "500501721": "ELECTRICITE GENERALE ET INDUSTRIELLE",
+          "500522770": "METAL DE COTE D'IVOIRE",
+          "500524798": "SF RECOVERY",
+          "500526231": "AFRIQ OIL SA",
+          "500545084": "AFRICAN NEW FUEL SARL.U",
+          "500547109": "LA COMPAGNIE DES CAOUTCHOUCS",
+          "500549798": "SOCIETE COOPERATIVE DES AGRICULTEURS",
+          "500554070": "BUILDING ENTERPRISE SECURITY & TECHNOLOGIES AFRICA LIMITED",
+          "500561508": "SOCIETE AWAHUS SERVICE",
+          "500576449": "AGENCE NATIONALE DE GESTION DES DECHETS",
+          "500583552": "HIGH STAR SECURITY",
+          "500600329": "INFAILLIBLE GOGOUA SERVICES",
+          "500605590": "COMPAGNIE IVOIRIENNE D'ARTICLES DE MÉNAGE",
+          "500605600": "JEBEILI AND COMPANY",
+          "500606382": "SOCIETE DE CONDITIONNEMENT DE CAFE C",
+          "500610265": "DANAYA COMPAGNIE SARL",
+          "500617503": "TAHI & FILS COMMODITIES SAR",
+          "500619115": "DUMONTHEIL YANN ROBIN",
+          "500622745": "IVOIRE SIGNALISATIONS ET TRAVAUX DIVERS",
+          "500626419": "CYRIAN INTERNATIONAL SA",
+          "500631903": "SOCIETE COOPERATIVE ELITES POUR LA PROMOTION DES PRODUITS AGRICOLES",
+          "500632301": "SOCIETE CIVILE IMMOBILIERE FIRST",
+          "500636495": "OTOMASYS SARL",
+          "500638843": "BOSSON YVES LOBOGNON CAROLLE KANGA",
+          "500639879": "OMEGA SARL",
+          "500641392": "HUILERIE INDUSTRIELLE DE BONOUA",
+          "500650988": "AFRICAINE DE REFRIGERATION INDUSTRIELLE ET CLIMATISATION",
+          "500657821": "KINEDEN COMMODITIES SA",
+          "500670230": "SOCIETE CIVILE PARTICULIERE AMK",
+          "500674594": "EDIS NOUVELLE",
+          "500688816": "GASPEC SARL",
+          "711000020": "SALAIRES ORGANISMES",
+          "711000068": "REGLEMENT FOURNISSEUR",
+          "711999992": "CHEQUES A PAYER"
+        },
+        "edges": [
+          {
+            "title": "500372011: 0.93%  ----> 711999992: 53.0% ",
+            "font": {
+              "align": "top",
+              "color": "red"
+            },
+            "from": "500372011",
+            "to": "711999992",
+            "arrows": "to",
+            "color": {
+              "inherit": "from"
+            },
+            "id": "500372011_711999992_edge",
+            "text": "text"
+          },
+          {
+            "title": "500169259: 0.02%  ----> 711999992: 0.0% ",
+            "font": {
+              "align": "top",
+              "color": "red"
+            },
+            "from": "500169259",
+            "to": "711999992",
+            "arrows": "to",
+            "color": {
+              "inherit": "from"
+            },
+            "id": "500169259_711999992_edge",
+            "text": "text"
+          },
+          {
+            "title": "500356614: 4.62%  ----> 711999992: 0.0% ",
+            "font": {
+              "align": "top",
+              "color": "red"
+            },
+            "from": "500356614",
+            "to": "711999992",
+            "arrows": "to",
+            "color": {
+              "inherit": "from"
+            },
+            "id": "500356614_711999992_edge",
+            "text": "text"
+          },
+        
+          {
+            "title": "500638843: 100.0%  ----> 711999992: 0.0% ",
+            "font": {
+              "align": "top",
+              "color": "red"
+            },
+            "from": "500638843",
+            "to": "711999992",
+            "arrows": "to",
+            "color": {
+              "inherit": "from"
+            },
+            "id": "500638843_711999992_edge",
+            "text": "text"
+          },
+          {
+            "title": "500583552: 0.03%  ----> 711999992: 0.0% ",
+            "font": {
+              "align": "top",
+              "color": "red"
+            },
+            "from": "500583552",
+            "to": "711999992",
+            "arrows": "to",
+            "color": {
+              "inherit": "from"
+            },
+            "id": "500583552_711999992_edge",
+            "text": "text"
+          },
+          {
+            "title": "500452875: 0.0%  ----> 711999992: 0.0% ",
+            "font": {
+              "align": "top",
+              "color": "red"
+            },
+            "from": "500452875",
+            "to": "711999992",
+            "arrows": "to",
+            "color": {
+              "inherit": "from"
+            },
+            "id": "500452875_711999992_edge",
+            "text": "text"
+          },
+          {
+            "title": "711000020: 0.0%  ----> 711999992: 0.0% ",
+            "font": {
+              "align": "top",
+              "color": "red"
+            },
+            "from": "711000020",
+            "to": "711999992",
+            "arrows": "to",
+            "color": {
+              "inherit": "from"
+            },
+            "id": "711000020_711999992_edge",
+            "text": "text"
+          },
+          {
+            "title": "116317874: 0.04%  ----> 711999992: 0.0% ",
+            "font": {
+              "align": "top",
+              "color": "red"
+            },
+            "from": "116317874",
+            "to": "711999992",
+            "arrows": "to",
+            "color": {
+              "inherit": "from"
+            },
+            "id": "116317874_711999992_edge",
+            "text": "text"
+          }
+        ],
+        "text": {},
+        "montant": {
+          "111002093_711999992_edge": "4.905.290",
+          "116303511_711999992_edge": "182.150",
+          "116304377_711999992_edge": "149.550",
+          "116317874_711999992_edge": "131.650",
+          "116331696_711999992_edge": "186.700",
+          "119340949_711999992_edge": "970.150",
+          "119341196_711999992_edge": "148.950",
+          "431300252_711999992_edge": "306.400",
+          "500014573_711999992_edge": "138.650",
+          "500018100_711999992_edge": "134.850",
+          "500019385_711999992_edge": "215.950",
+          "500033964_711999992_edge": "274.400",
+          "500041289_711999992_edge": "157.250",
+          "500041903_711999992_edge": "607.000",
+          "500042135_711999992_edge": "269.000"
+    
+        },
+        "solde": "null",
+        "date": "string"
+      }
+    }
+  ],
+  "code": 200,
+  "message": "client graph data."
+}
