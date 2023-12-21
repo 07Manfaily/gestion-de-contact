@@ -845,4 +845,57 @@ class Graph_chaine extends Component {
   }
 }
 
+
+
+
+<Modal open={this.state.open}>
+          <div>
+            {this.state.label[this.state.sourc]} --{" "}
+            {this.state.label[this.state.targ]} : {this.state.montant} XOF
+          </div>
+          <div>
+            {this.state.loading ? (
+              <div style={{ textAlign: "center" }}>
+                <CircularProgress />
+              </div>
+            ) : (
+              <>
+                <div className="row">
+                  <div className="col-md-6">
+                    <input
+                      type="date"
+                      locale="fr-FR"
+                      onChange={this.PickeronChange1}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <input
+                      type="date"
+                      locale="fr-FR"
+                      onChange={this.PickeronChange2}
+                    />
+                  </div>
+                </div>
+                <br />
+                <ReactTable
+                  data={this.state.operation_rows}
+                  filterable
+                  defaultFilterMethod={(filter, row) =>
+                    String(row[filter.id]).includes(filter.value)
+                  }
+                  columns={this.state.operation_columns}
+                  defaultPageSize={20}
+                  style={{ height: "auto" }}
+                  className="-striped -highlight"
+                />
+              </>
+            )}
+          </div>
+          <div>
+            <Button onClick={this.openfct} color="red">
+              Fermer
+            </Button>
+          </div>
+        </Modal>
+
 export default withAuth()(Graph_chaine);
