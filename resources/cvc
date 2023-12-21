@@ -1,1193 +1,848 @@
-import React, { Component } from 'react';
-import {Button, Form, Dropdown, Checkbox, Modal, Loader, List, Label, Input} from 'semantic-ui-react'
-import _ from 'lodash';
+import React, { Component } from "react";
+import {
+  Button,
+  Form,
+  Dropdown,
+  Checkbox,
+  Modal,
+  Loader,
+  List,
+  Label,
+  Input,
+} from "semantic-ui-react";
+import _ from "lodash";
 import Graph from "react-graph-vis";
 import cloneDeep from "lodash/cloneDeep";
 import { v4 as uuidv4 } from "uuid";
 import ReactSlider from "react-slider";
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
 import {
-    Accordion,
-    AccordionItem,
-    AccordionItemHeading,
-    AccordionItemButton,
-    AccordionItemPanel,
-} from 'react-accessible-accordion';
+  Accordion,
+  AccordionItem,
+  AccordionItemHeading,
+  AccordionItemButton,
+  AccordionItemPanel,
+} from "react-accessible-accordion";
 import ReactTable from "react-table";
 
 // Demo styles, see 'Styles' section below for some notes on use.
-import 'react-accessible-accordion/dist/fancy-example.css';  
+import "react-accessible-accordion/dist/fancy-example.css";
 
 import withAuth from "../Connexion/withAuth";
-import {getCookie, getCurrentDate} from "../Connexion/utils";
+import { getCookie, getCurrentDate } from "../Connexion/utils";
 
-import 'semantic-ui-css/semantic.min.css';
-import './custom.css';
-import 'react-semantic-ui-datepickers/dist/react-semantic-ui-datepickers.css';
+import "semantic-ui-css/semantic.min.css";
+import "./custom.css";
+import "react-semantic-ui-datepickers/dist/react-semantic-ui-datepickers.css";
 
-import bleu from '../imgs/bleu.png';
-import rouge from '../imgs/rouge.png';
-import vert from '../imgs/vert.png';
-import jaune from '../imgs/jaune.png';
-import noir from '../imgs/noir.png';
-import violet from '../imgs/violet.png';
+import bleu from "../imgs/bleu.png";
+import rouge from "../imgs/rouge.png";
+import vert from "../imgs/vert.png";
+import jaune from "../imgs/jaune.png";
+import noir from "../imgs/noir.png";
+import violet from "../imgs/violet.png";
 
 function fetchtimeout(ms, promise) {
-    return new Promise(function(resolve, reject) {
-        setTimeout(function() {
-            reject(new Error("timeout"))
-        }, ms)
-        promise.then(resolve, reject)
-    })
+  return new Promise(function (resolve, reject) {
+    setTimeout(function () {
+      reject(new Error("timeout"));
+    }, ms);
+    promise.then(resolve, reject);
+  });
 }
 
 class Graph_chaine extends Component {
+  state = {
+    nodes: [],
+    edge: "",
+    edges: [],
+    grph: {},
+    ff: uuidv4,
+    filter: [],
+    check: { 1: false, 2: false, 3: false },
+    codes: "",
+    nodeid: "",
+    date: [],
+    date1: "",
+    date2: "",
+    grouper: {},
+    group: { 1: false },
+    loader: "none",
+    graphkey: uuidv4,
+    text: {},
+    operation_rows: [],
+    operation_columns: [],
+    open: false,
+    ouvre: false,
+    sourc: "",
+    targ: "",
+    ll: {},
+    rct: [],
+    montant: "",
+    montants: {},
+    label: {},
+    range: 5,
+    sens: "out",
+    level: "level_2",
+    solde: "",
+    choice: "filtre_1",
+    size: undefined,
+    entr: "",
+    cli: "",
+    tcr: "",
+    codes_cli: [],
+    btnShow: "hidden",
+    cardShow: "",
+    dates: "",
+    datee: "",
+    info: "none",
+    rows: [],
+  };
 
-    state={nodes:[],edge:'', edges:[],grph:{},ff:uuidv4,filter:[],check:{'1':false,'2':false,'3':false},codes:'',nodeid:'', date:[], date1:'', date2:'', grouper:{},
-        group:{'1':false}, loader:'none',graphkey:uuidv4,text:{},operation_rows:[],operation_columns:[],open:false,ouvre:false,sourc:'',targ:'',ll:{}, 
-        rct:[], montant:'',montants:{},label:{},range:5,sens:'out',level:'level_2',solde:'', choice:'filtre_1', size: undefined, entr:'',
-        cli:'', tcr:'', codes_cli:[], btnShow:'hidden', cardShow: '', dates: '', datee:'', info: 'none', rows: []}
+  roles = `${window.localStorage.roles}`;
 
-    roles = `${window.localStorage.roles}`;
+  componentDidMount() {
+    // roles
+    console.log("role", this.roles);
+    // load some data
+    this.load_dropdown();
+  }
 
-    componentDidMount() {
-        // roles
-        console.log('role', this.roles);
-        // load some data
-        this.load_dropdown();
-    }
-
-    load_dropdown=()=>{
-        //
-        fetch('/api/init/dropdown', {
-            credentials:'same-origin',
-            method: 'GET',
-            mode: 'cors',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN':getCookie('csrf_refresh_token')
-            },
-        }).then(response => {
-            if (response.status !== 200) {
-                if(response.status===401){window.location.replace('/login')}
-                throw new Error('Access denied');
-            }
-            return response.json();               
-        }).then(json =>{
-            this.setState({labels:json.labels});
-        }).catch((error) => console.log(error));
-    }
-
-    onChange=(e,data)=>{
-        this.setState({cli:data.value,entr:data.value,tcr:data.value})
-        this.setState({codes:data.value})        
-    }
-
-    onChange_=(e,data)=>{
-        console.log('e/data', data.value);
-        this.setState({cli:data.value,entr:data.value,tcr:data.value})
-        this.setState({codes:data.value})
-    }
-
-    openfct=()=>{
-        this.setState({open:!this.state.open})
-        this.setState({date:[]})
-    }
-
-    fermer=()=>{
-        this.setState({ouvre:!this.state.ouvre})
-    }  
-
-    show_network_chaine=(value,filter,nodeid,range)=>{
-        const width=window.screen.width;
-        const height=window.screen.height;
-
-        fetch('/network/preprocessing/node/graph', {
-            credentials: 'same-origin',
-            method: 'POST',
-            mode: 'cors',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            },
-            body: JSON.stringify({
-                codes:value,
-                  
-            })
-        }).then(response => {
-            if (response.status !== 200) {
-                if(response.status===401){window.location.replace('/login')}
-                throw new Error('Access denied');
-            }
-            return response.json();
-        }).then(json => {
-            console.log('you be you', json)
-            let grph=cloneDeep(this.state.grph)
-            grph['nodes']=[json.data[0].data.nodes]
-            grph['edges']=[json.data[0].data.edges]
-            //
-            // let dates= json.date[0];
-            // dates= dates.split('00:00:00');
-            //
-            // let datee= json.date[1];
-            // datee= datee.split('00:00:00');
-            //
-            this.setState({nodes:json.data[0].data.nodes});
-            this.setState({edges:json.data[0].data.edges});
-            this.setState({grph:grph});
-            this.setState({loader:'none'});
-            this.setState({text:json.data[0].data.text});
-            this.setState({montants:json.data[0].data.montant});
-            this.setState({solde:json.data[0].data.solde});
-            this.setState({label:json.data[0].data.label});
-            // this.setState({dates: dates[0]});
-            // this.setState({datee: datee[0]});
-            this.setState({info: 'flex'});
-            this.setState({cardShow: 'hidden'});
-            this.setState({btnShow: ''});
-            this.setState({rows: json.data[0].data.rows});
-        }).catch((error) => {
-            console.log(error)
-            this.setState({loader:'none'})
-        });
-    }
-
-    handleChanges = (e,data) => {        
-        this.setState({group:data.checked})
-        let verif = this.state.group
-        console.log(verif)       
-    }
-
-    handlechange=(e,data)=>{
-        let chc=this.state.check
-        console.log(chc)
-        chc[data.value]=!chc[data.value]
-        this.setState({check:chc})
-        var filter=[]
-        for( var i in chc){
-            if( chc[i]==true){
-                filter.push(i)}
+  load_dropdown = () => {
+    //
+    fetch("/api/init/dropdown", {
+      credentials: "same-origin",
+      method: "GET",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-TOKEN": getCookie("csrf_refresh_token"),
+      },
+    })
+      .then((response) => {
+        if (response.status !== 200) {
+          if (response.status === 401) {
+            window.location.replace("/login");
+          }
+          throw new Error("Access denied");
         }
-        this.setState({loader:'block',graphkey:uuidv4,filter:filter})
-        this.show_network_chaine(this.state.codes,filter,this.state.nodeid,this.state.range,this.state.date);
-    }
+        return response.json();
+      })
+      .then((json) => {
+        this.setState({ labels: json.labels });
+      })
+      .catch((error) => console.log(error));
+  };
 
-    PickeronChange1=(event)=>{
-        var date1 = event.target.value;
-        console.log('date1', date1)
-        this.setState({date1: date1})
-    }
+  onChange = (e, data) => {
+    this.setState({ cli: data.value, entr: data.value, tcr: data.value });
+    this.setState({ codes: data.value });
+  };
 
-    PickeronChange2=(event)=>{
-        var date2 = event.target.value;
-        console.log('date2', date2)
-        this.setState({date2: date2})
-        var date = [];
-        date.push(this.state.date1);
-        date.push(date2);
-        console.log('date', date)
-        this.setState({date: date});
-        this.get_transacts(this.state.edge, date);
-    }
+  onChange_ = (e, data) => {
+    console.log("e/data", data.value);
+    this.setState({ cli: data.value, entr: data.value, tcr: data.value });
+    this.setState({ codes: data.value });
+  };
 
-    SensonChange=(e,data)=>{
-        this.setState({sens:data.value})
-    }
+  openfct = () => {
+    this.setState({ open: !this.state.open });
+    this.setState({ date: [] });
+  };
 
-    LevelonChange=(e,data)=>{
-        this.setState({level:data.value})
-    }
+  fermer = () => {
+    this.setState({ ouvre: !this.state.ouvre });
+  };
 
-    ChoiceonChange=(e,data)=>{
-        this.setState({choice:data.value})
-    }
+  show_network_chaine = (value, filter, nodeid, range) => {
+    const width = window.screen.width;
+    const height = window.screen.height;
 
-    handleRangechange=(value)=>{
-        this.setState({range:value})
-    }
-
-    handleRunClick=()=>{
-        let grph=cloneDeep(this.state.grph);
-        grph['nodes']=[];
-        grph['edges']=[];
-        this.setState({grph:grph,nodeid:''});
-        this.setState({loader:'block'});
-        console.log("date avant envoie", this.state.date)
-        // this.handleClick();
-        this.show_network_chaine(this.state.codes);        
-    }
-
-    selectNode=(event)=> {
-        console.log('selectNode')
-        var {nodes,edges}=event;
-    }
-
-    selectEdge=(event)=> {
-        console.log('selectedge')
-        var {nodes,edges}=event;
-        console.log('selectedge', edges[0].split('_'));
-        // load transacts for edge
-        this.get_transacts(edges[0]);
-        // show modal
-        this.setState({edge: edges[0], montant:this.state.montants[edges[0]],open:true,sourc:edges[0].split('_')[0],targ:edges[0].split('_')[1]});
-
-    }
-
-    get_transacts=(val, date=[])=>{
-        //
-        console.log('val', val)
-        this.setState({loader:'block'});
-        //
-        fetch('/api/get/transaction', {
-            credentials:'same-origin',
-            method: 'POST',
-            mode: 'cors',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN':getCookie('csrf_refresh_token')
-                //Authorization: `Bearer ${window.localStorage.refreshToken}`
-            },
-            body: JSON.stringify({
-                edge_id: val,
-                date: date
-            })
-        }).then(response => {
-            if (response.status !== 200) {
-                if(response.status===401){window.location.replace('/login')}
-                throw new Error('Access denied');
-            }
-            return response.json();               
-        }).then(json =>{
-            console.log('json', json);
-            // stop loading
-            this.setState({loader:'none'});
-            //
-            this.setState({operation_rows:json.rows, operation_columns: json.columns});
-        }).catch((error) => {
-            // stop loading
-            this.setState({loader:'none'});
-            console.log(error)
-        });
-    }
-
-    deselectNode=(event)=>{
-        console.log('deselectNode')
-        var {nodes,edges}=event;
-        let chc=this.state.check
-        var filter=[]
-        for( var i in chc){
-            if( chc[i]==true){
-                filter.push(i)}
+    fetch("/network/preprocessing/node/graph", {
+      credentials: "same-origin",
+      method: "POST",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      body: JSON.stringify({
+        codes: value,
+      }),
+    })
+      .then((response) => {
+        if (response.status !== 200) {
+          if (response.status === 401) {
+            window.location.replace("/login");
+          }
+          throw new Error("Access denied");
         }
-    }
+        return response.json();
+      })
+      .then((json) => {
+        console.log("you be you", json);
+        // let grph=cloneDeep(this.state.grph)
+        const grph = {
+          nodes: json.data[0].data.nodes,
+          edges: json.data[0].data.edges,
+        };
+        // grph['nodes']=[json.data[0].data.nodes]
+        // grph['edges']=[json.data[0].data.edges]
+        this.setState({ nodes: json.data[0].data.nodes });
+        this.setState({ edges: json.data[0].data.edges });
+        this.setState({ grph: grph });
+        this.setState({ operation_rows: json.data[0].data.rows});
+        this.setState({ operation_columns: json.data[0].data.columns});
+        this.setState({ loader: "none" });
+        this.setState({ text: json.data[0].data.text });
+        this.setState({ montants: json.data[0].data.montant });
+        this.setState({ solde: json.data[0].data.solde });
+        this.setState({ label: json.data[0].data.label });
+        this.setState({ info: "flex" });
+        this.setState({ cardShow: "hidden" });
+        this.setState({ btnShow: "" });
+        this.setState({ rows: json.data[0].data.rows });
+      })
+      .catch((error) => {
+        console.log(error);
+        this.setState({ loader: "none" });
+      });
+  };
 
-    hoverNode=(event)=>{
-        console.log('hover node',event['node'])
-    }
+  handleChanges = (e, data) => {
+    this.setState({ group: data.checked });
+    let verif = this.state.group;
+    console.log(verif);
+  };
 
-    handleClick=()=> {
-        console.log('btnShow', this.state.btnShow)
-        if(this.state.btnShow === '') {
-            this.setState({btnShow: 'hidden'})
-            this.setState({cardShow: ''})
-        } else if (this.state.btnShow === 'hidden') {
-            this.setState({btnShow: ''})
-            this.setState({cardShow: 'hidden'})
-        }
+  handlechange = (e, data) => {
+    let chc = this.state.check;
+    console.log(chc);
+    chc[data.value] = !chc[data.value];
+    this.setState({ check: chc });
+    var filter = [];
+    for (var i in chc) {
+      if (chc[i] == true) {
+        filter.push(i);
+      }
     }
+    this.setState({ loader: "block", graphkey: uuidv4, filter: filter });
+    this.show_network_chaine(
+      this.state.codes,
+      filter,
+      this.state.nodeid,
+      this.state.range,
+      this.state.date
+    );
+  };
 
-    clearOption = () => {
-        this.setState({selection: undefined});
-        this.setState({info: 'none'});
-        this.setState({solde: ''});
-        this.setState({group: {1:false}});
-        this.setState({entr: ''});
-        this.setState({labels: ''});
+  PickeronChange1 = (event) => {
+    var date1 = event.target.value;
+    console.log("date1", date1);
+    this.setState({ date1: date1 });
+  };
+
+  PickeronChange2 = (event) => {
+    var date2 = event.target.value;
+    console.log("date2", date2);
+    this.setState({ date2: date2 });
+    var date = [];
+    date.push(this.state.date1);
+    date.push(date2);
+    console.log("date", date);
+    this.setState({ date: date });
+    this.get_transacts(this.state.edge, date);
+  };
+
+  SensonChange = (e, data) => {
+    this.setState({ sens: data.value });
+  };
+
+  LevelonChange = (e, data) => {
+    this.setState({ level: data.value });
+  };
+
+  ChoiceonChange = (e, data) => {
+    this.setState({ choice: data.value });
+  };
+
+  handleRangechange = (value) => {
+    this.setState({ range: value });
+  };
+
+  handleRunClick = () => {
+    let grph = cloneDeep(this.state.grph);
+    grph["nodes"] = [];
+    grph["edges"] = [];
+    this.setState({ grph: grph, nodeid: "" });
+    this.setState({ loader: "block" });
+    console.log("date avant envoie", this.state.date);
+    // this.handleClick();
+    this.show_network_chaine(this.state.codes);
+  };
+
+  selectNode = (event) => {
+    console.log("selectNode");
+    var { nodes, edges } = event;
+  };
+
+  selectEdge = (event) => {
+    console.log("selectedge");
+    var { nodes, edges } = event;
+    console.log("selectedge", edges[0].split("_"));
+    // load transacts for edge
+    this.get_transacts(edges[0]);
+    // show modal
+    this.setState({
+      edge: edges[0],
+      montant: this.state.montants[edges[0]],
+      open: true,
+      sourc: edges[0].split("_")[0],
+      targ: edges[0].split("_")[1],
+    });
+  };
+
+  get_transacts = (val, date = []) => {
+    //
+    console.log("val", val);
+    this.setState({ loader: "block" });
+    if(val){
+      this.setState({ loader: "none" });
+    }
+    //
+    // fetch("/api/get/transaction", {
+    //   credentials: "same-origin",
+    //   method: "POST",
+    //   mode: "cors",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     "X-CSRF-TOKEN": getCookie("csrf_refresh_token"),
+    //     //Authorization: `Bearer ${window.localStorage.refreshToken}`
+    //   },
+    //   body: JSON.stringify({
+    //     edge_id: val,
+    //     date: date,
+    //   }),
+    // })
+    //   .then((response) => {
+    //     if (response.status !== 200) {
+    //       if (response.status === 401) {
+    //         window.location.replace("/login");
+    //       }
+    //       throw new Error("Access denied");
+    //     }
+    //     return response.json();
+    //   })
+    //   .then((json) => {
+    //     console.log("json", json);
+    //     // stop loading
+    //     this.setState({ loader: "none" });
+    //     //
+    //     this.setState({
+    //       operation_rows: json.rows,
+    //       operation_columns: json.columns,
+    //     });
+    //   })
+    //   .catch((error) => {
+    //     // stop loading
+    //     this.setState({ loader: "none" });
+    //     console.log(error);
+    //   });
+  };
+
+  deselectNode = (event) => {
+    console.log("deselectNode");
+    var { nodes, edges } = event;
+    let chc = this.state.check;
+    var filter = [];
+    for (var i in chc) {
+      if (chc[i] == true) {
+        filter.push(i);
+      }
+    }
+  };
+
+  hoverNode = (event) => {
+    console.log("hover node", event["node"]);
+  };
+
+  handleClick = () => {
+    console.log("btnShow", this.state.btnShow);
+    if (this.state.btnShow === "") {
+      this.setState({ btnShow: "hidden" });
+      this.setState({ cardShow: "" });
+    } else if (this.state.btnShow === "hidden") {
+      this.setState({ btnShow: "" });
+      this.setState({ cardShow: "hidden" });
+    }
+  };
+
+  clearOption = () => {
+    this.setState({ selection: undefined });
+    this.setState({ info: "none" });
+    this.setState({ solde: "" });
+    this.setState({ group: { 1: false } });
+    this.setState({ entr: "" });
+    this.setState({ labels: "" });
+  };
+
+  exportFile = () => {
+    // upload file method
+    /* convert state to workbook */
+    const ws1 = XLSX.utils.json_to_sheet(this.state.rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws1, "Liste");
+    /* generate XLSX file and send to client */
+    XLSX.writeFile(wb, "Liste" + "_" + getCurrentDate() + ".xlsx");
+  };
+
+  render() {
+    var options = {
+      nodes: {
+        scaling: {
+          min: 10,
+          max: 30,
+        },
+        font: {
+          size: 10,
+          face: "Tahoma",
+        },
+      },
+      physics: {
+        forceAtlas2Based: {
+          gravitationalConstant: -80,
+          centralGravity: 0.005,
+          springLength: 50,
+          springConstant: 0.15,
+        },
+        maxVelocity: 146,
+        solver: "forceAtlas2Based",
+        timestep: 0.35,
+        stabilization: { iterations: 300 },
+      },
+      interaction: { hover: true },
+      edges: {
+        width: 1,
+        font: { size: 10 },
+        smooth: {
+          type: "continuous",
+        },
+      },
+      height: "820px",
+      width: "150%"
     };
 
-    exportFile=() => {
-        // upload file method
-        /* convert state to workbook */
-        const ws1 = XLSX.utils.json_to_sheet(this.state.rows);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws1, "Liste");
-        /* generate XLSX file and send to client */
-        XLSX.writeFile(wb, "Liste"+"_"+getCurrentDate()+".xlsx");     
-    }
+    const events = {
+      selectNode: this.selectNode,
+      deselectNode: this.deselectNode,
+      hoverNode: this.hoverNode,
+      selectEdge: this.selectEdge,
+    };
 
-    render() {
-        var options = {
-            nodes:{
-                scaling:{
-                    min:10,
-                    max:30
-                },
-                font:{
-                    size:12,
-                    face:'Tahoma'
-                }
-            },
-            physics:{
-                forceAtlas2Based:{
-                    gravitationalConstant:-50,
-                    centralGravity:0.005,
-                    springLength:100,
-                    springConstant:0.18
-                },
-                maxVelocity:146,
-                solver:'forceAtlas2Based',
-                timestep:0.35,
-                stabilization:{iterations:300}
-            },
-            interaction: { hover: true },
-            edges: {
-                width:0.15,
-                font:{size:10},
-                smooth: {
-                    type: "continuous",
-                },
-            },
-            height: "600px"
-        }
+    const in_out = [
+      {
+        key: "opt_in",
+        text: "credit",
+        value: "in",
+      },
+      {
+        key: "opt_out",
+        text: "debit",
+        value: "out",
+      },
+    ];
 
-        const events={
-            selectNode: this.selectNode ,
-            deselectNode:this.deselectNode,
-            hoverNode: this.hoverNode,
-            selectEdge:this.selectEdge
-        }
+    const level = [
+      {
+        key: "level_1",
+        text: "Niveau 1",
+        value: "level_1",
+      },
+      {
+        key: "level_2",
+        text: "Niveau 2",
+        value: "level_2",
+      },
+      {
+        key: "level_3",
+        text: "Niveau 3",
+        value: "level_3",
+      },
+      {
+        key: "level_4",
+        text: "Niveau 4",
+        value: "level_4",
+      },
+    ];
 
-        const in_out=[
-            {
-                key:'opt_in',
-                text:'credit',
-                value:'in'
-            },
-            {
-                key:'opt_out',
-                text:'debit',
-                value:'out'
-            }
-        ]
+    const choice = [
+      {
+        key: "filtre_1",
+        text: "Poids de la transaction",
+        value: "filtre_1",
+      },
+      {
+        key: "filtre_2",
+        text: "Les Top valeur",
+        value: "filtre_2",
+      },
+    ];
 
-        const level=[
-            {
-                key:'level_1',
-                text:'Niveau 1',
-                value:'level_1'
-            },
-            {
-                key:'level_2',
-                text:'Niveau 2',
-                value:'level_2'
-            },
-            {
-                key:'level_3',
-                text:'Niveau 3',
-                value:'level_3'
-            },
-            {
-                key:'level_4',
-                text:'Niveau 4',
-                value:'level_4'
-            }
-        ]
-
-        const choice = [
-            {
-                key: 'filtre_1',
-                text: 'Poids de la transaction',
-                value: 'filtre_1'
-            },
-            {
-                key: 'filtre_2',
-                text: 'Les Top valeur',
-                value: 'filtre_2'
-            }
-        ]
-
-        return(
-            <>
-                <div className='row' style={{'display': this.state.info}}>
-                    {/* <div className='col-md-12'> */}
-                        <div className='col-md-4'>
-                            <h5 className="mb-0">{'Num RTC -'+this.state.entr}</h5>
-                        </div>
-                        <div className='col-md-4'>
-                            <button type="button" className="btn btn-primary pos_btn_exp" onClick={this.exportFile}>
-                                Exporter Données
-                            </button>
-                        </div>
-                        <div className='col-md-4'>
-                            <h5 className="mb-0">{this.state.dates+' - '+ this.state.datee}</h5>
-                        </div> 
-                    {/* </div> */}
+    return (
+      <>
+        <div className="row" style={{ display: this.state.info }}>
+          {/* <div className='col-md-12'> */}
+          <div className="col-md-4">
+            <h5 className="mb-0">{"Num RTC -" + this.state.entr}</h5>
+          </div>
+          <div className="col-md-4">
+            <button
+              type="button"
+              className="btn btn-primary pos_btn_exp"
+              onClick={this.exportFile}
+            >
+              Exporter Données
+            </button>
+          </div>
+          <div className="col-md-4">
+            <h5 className="mb-0">
+              {this.state.dates + " - " + this.state.datee}
+            </h5>
+          </div>
+          {/* </div> */}
+        </div>
+        <div className="row">
+          <div className="col-md-9">
+            <Loader
+              style={{ display: this.state.loader, zIndex: 9999999 }}
+              active
+              inline="centered"
+              size="massive"
+            />
+            {this.state.nodes.length > 0 && (
+              <>
+                <Graph
+                  key={this.state.graphkey}
+                  graph={this.state.grph}
+                  options={options}
+                  events={events}
+                  // getNetwork={network => {
+                  //     console.log('network_key',network.body.data.nodes)
+                  // }}
+                />
+              </>
+            )}
+            <div
+              className="float-start"
+              style={{
+                display: this.state.info,
+                textAlign: "left",
+                position:"initial",
+                marginBottom: "-40%"
+              }}
+            >
+            <tr><td>
+                  <figure>
+                    <img src={bleu} className="legende" />
+                    <figcaption>Entreprise séléctionnée</figcaption>
+                  </figure>
+                </td>   <td>
+                  <figure>
+                    <img src={vert} className="legende" />
+                    <figcaption>Clients Sains</figcaption>
+                  </figure>
+                </td></tr>
+            <tr>    <td>
+                  <figure>
+                    <img src={jaune} className="legende" />
+                    <figcaption>Clients en S2</figcaption>
+                  </figure>
+                </td>
+                <td>
+                  <figure>
+                    <img src={rouge} className="legende" />
+                    <figcaption>Clients en S3</figcaption>
+                  </figure>
+                </td></tr>
+            <tr></tr>
+                
+             
+            
+              
+          
+            </div>
+          </div>
+          <div className="col-md-3" style={{ float: "right" }}>
+            <div className="fixed-plugin">
+              <a
+                className="fixed-plugin-button text-dark position-fixed px-3 py-2"
+                style={{ visibility: this.state.btnShow }}
+                onClick={this.handleClick}
+              >
+                <i className="material-icons py-2">menu</i>
+              </a>
+              <div
+                className="card shadow-lg"
+                style={{ visibility: this.state.cardShow }}
+              >
+                <div className="card-header pb-0 pt-3">
+                  <div className="float-start">
+                    <h5 className="mb-0">Parametrage Recherche</h5>
+                    <p>Choisissez parmis les options.</p>
+                  </div>
+                  <div className="float-end">
+                    <button
+                      className="btn btn-link text-dark p-0 fixed-plugin-close-button"
+                      onClick={this.handleClick}
+                    >
+                      <i className="material-icons">clear</i>
+                    </button>
+                  </div>
                 </div>
-                <div className='row'>
-                    <div className='col-md-9'>                       
-                        <Loader style={{display:this.state.loader, zIndex: 9999999}} active inline='centered' size='massive'/>
-                        {
-                            this.state.nodes.length>0 &&
-                            <>
-                                <Graph key={this.state.graphkey}
-                                    graph={this.state.grph}
-                                    options={options}
-                                    events={events}
-                                    // getNetwork={network => {
-                                    //     console.log('network_key',network.body.data.nodes)
-                                    // }}
-                                />
-                            </>                        
-                        }
-                        <div className="float-start" style={{'display': this.state.info, 'textAlign': 'center', 'marginTop': '-80px'}}>
-                            <tr>
-                                <td>
-                                    <figure>
-                                        <img src={bleu} className='legende'/>
-                                        <figcaption>Entreprise séléctionnée</figcaption>
-                                    </figure> 
-                                </td>
-                                <td> 
-                                    <figure>
-                                        <img src={vert} className='legende'/>
-                                        <figcaption>Clients Sains</figcaption>
-                                    </figure>
-                                </td>
-                                <td> 
-                                    <figure>
-                                        <img src={jaune} className='legende'/>
-                                        <figcaption>Clients en S2</figcaption>
-                                    </figure>
-                                </td>
-                                <td> 
-                                    <figure>
-                                        <img src={rouge} className='legende'/>
-                                        <figcaption>Clients en S3</figcaption>
-                                    </figure>
-                                </td> 
-                                <td> 
-                                    <figure>
-                                        <img src={violet} className='legende'/>
-                                        <figcaption style={{'fontSize':'12px'}}>Clients faisant une transaction avec compte non SGCI</figcaption>
-                                    </figure>
-                                </td>     
-                                <td> 
-                                    <figure>
-                                        <img src={noir} className='legende'/>
-                                        <figcaption>Clients hors SGCI</figcaption>
-                                    </figure>
-                                </td>
-                            </tr>
-                        </div>
-                    </div>
-                    <div className='col-md-3' style={{'float': 'right'}}>
-                        <div className="fixed-plugin">
-                            <a className="fixed-plugin-button text-dark position-fixed px-3 py-2" style={{'visibility':this.state.btnShow}} onClick={this.handleClick}>
-                                <i className="material-icons py-2">menu</i>
-                            </a>
-                            <div className="card shadow-lg" style={{'visibility':this.state.cardShow}}>
-                                <div className="card-header pb-0 pt-3">
-                                    <div className="float-start">
-                                        <h5 className="mb-0">Parametrage Recherche</h5>
-                                        <p>Choisissez parmis les options.</p>
-                                    </div>
-                                    <div className="float-end">
-                                        <button className="btn btn-link text-dark p-0 fixed-plugin-close-button" onClick={this.handleClick}>
-                                            <i className="material-icons">clear</i>
-                                        </button>
-                                    </div>
-                                </div>
-                                {/* <hr className="horizontal dark my-1" /> */}
-                                <div className="card-body pt-sm-3 pt-0">
-                                    <div className="row">
-                                        {/* <div className="col-md-12"> */}
-                                        <Accordion>
-                                            <AccordionItem style={{'display': (this.roles==='admin' || this.roles==='cft')?'':'none'}}>
-                                                <AccordionItemHeading>
-                                                    <AccordionItemButton>
-                                                        Particulier
-                                                    </AccordionItemButton>
-                                                </AccordionItemHeading>
-                                                <AccordionItemPanel>
-                                                    <Input key='search_by_cli' placeholder='Code Client' value={this.state.cli} onChange={this.onChange_}/>
-                                                    {
-                                                        this.state.solde != '' &&
-                                                        <Label color='teal' size='large' style={{'marginTop':'10px','marginBottom':'10px'}}>
-                                                            {'Solde: '+this.state.solde+' XOF'}
-                                                        </Label>
-                                                    }
-                                                </AccordionItemPanel>
-                                            </AccordionItem>
-                                            <AccordionItem>
-                                                <AccordionItemHeading>
-                                                    <AccordionItemButton>
-                                                        Entreprise
-                                                    </AccordionItemButton>
-                                                </AccordionItemHeading>
-                                                <AccordionItemPanel>
-                                                    <div className="row">
-                                                        <Input key='network_chaine' placeholder='Code Client Entreprise' value={this.state.entr} onChange={this.onChange}/>
-                                                        {
-                                                            this.state.solde != '' &&
-                                                            <Label color='teal' size='large' style={{'marginTop':'10px','marginBottom':'10px'}}>
-                                                                {'Solde: '+this.state.solde+' XOF'}
-                                                            </Label>
-                                                        }
-                                                    </div>                                                    
-                                                </AccordionItemPanel>
-                                            </AccordionItem>
-                                        </Accordion>                                            
-                                        {/* </div> */}
-                                    </div><br/>
-                                    <div className="row">
-                                        {/* <Popup
+                {/* <hr className="horizontal dark my-1" /> */}
+                <div className="card-body pt-sm-3 pt-0">
+                  <div className="row">
+                    {/* <div className="col-md-12"> */}
+                    <Accordion>
+                      <AccordionItem
+                        style={{
+                          display:
+                            this.roles === "admin" || this.roles === "cft"
+                              ? ""
+                              : "none",
+                        }}
+                      >
+                        <AccordionItemHeading>
+                          <AccordionItemButton>Particulier</AccordionItemButton>
+                        </AccordionItemHeading>
+                        <AccordionItemPanel>
+                          <Input
+                            key="search_by_cli"
+                            placeholder="Code Client"
+                            value={this.state.cli}
+                            onChange={this.onChange_}
+                          />
+                          {this.state.solde != "" && (
+                            <Label
+                              color="teal"
+                              size="large"
+                              style={{
+                                marginTop: "10px",
+                                marginBottom: "10px",
+                              }}
+                            >
+                              {"Solde: " + this.state.solde + " XOF"}
+                            </Label>
+                          )}
+                        </AccordionItemPanel>
+                      </AccordionItem>
+                      <AccordionItem>
+                        <AccordionItemHeading>
+                          <AccordionItemButton>Entreprise</AccordionItemButton>
+                        </AccordionItemHeading>
+                        <AccordionItemPanel>
+                          <div className="row">
+                            <Input
+                              key="network_chaine"
+                              placeholder="Code Client Entreprise"
+                              value={this.state.entr}
+                              onChange={this.onChange}
+                            />
+                            {this.state.solde != "" && (
+                              <Label
+                                color="teal"
+                                size="large"
+                                style={{
+                                  marginTop: "10px",
+                                  marginBottom: "10px",
+                                }}
+                              >
+                                {"Solde: " + this.state.solde + " XOF"}
+                              </Label>
+                            )}
+                          </div>
+                        </AccordionItemPanel>
+                      </AccordionItem>
+                    </Accordion>
+                    {/* </div> */}
+                  </div>
+                  <br />
+                  <div className="row">
+                    {/* <Popup
                                             trigger={ */}
-                                            <Checkbox
-                                                key='chaine_check_green'
-                                                label='Clients en S1'
-                                                value='1'
-                                                onChange={this.handlechange}
-                                                checked={this.state.check['1']}
-                                            />
-                                            {/* }
+                    <Checkbox
+                      key="chaine_check_green"
+                      label="Clients en S1"
+                      value="1"
+                      onChange={this.handlechange}
+                      checked={this.state.check["1"]}
+                    />
+                    {/* }
                                             content='Clients SGCI en S1'
                                             inverted
                                             style={{'backgroundColor':'green'}}
                                         /> */}
-                                            
-                                        {/* <Popup
+
+                    {/* <Popup
                                             trigger={ */}
-                                                <Checkbox
-                                                    key='chaine_check_orange'
-                                                    label='Clients en S2'
-                                                    value='2'
-                                                    onChange={this.handlechange}
-                                                    checked={this.state.check['2']}
-                                                />
-                                            {/* }
+                    <Checkbox
+                      key="chaine_check_orange"
+                      label="Clients en S2"
+                      value="2"
+                      onChange={this.handlechange}
+                      checked={this.state.check["2"]}
+                    />
+                    {/* }
                                             content='Clients SGCI en S2'
                                             inverted
                                             style={{'backgroundColor':'orange'}}
                                         /> */}
-                                            
-                                        {/* <Popup
+
+                    {/* <Popup
                                             trigger={ */}
-                                                <Checkbox
-                                                    key='chaine_check_red_'
-                                                    label='Clients en S3'
-                                                    value='3'
-                                                    onChange={this.handlechange}
-                                                    checked={this.state.check['3']}
-                                                />
-                                            {/* }
+                    <Checkbox
+                      key="chaine_check_red_"
+                      label="Clients en S3"
+                      value="3"
+                      onChange={this.handlechange}
+                      checked={this.state.check["3"]}
+                    />
+                    {/* }
                                             content='Clients SGCI en S3'
                                             inverted
                                             style={{'backgroundColor':'red'}}
                                         /> */}
-                                            
-                                        {/* <Popup
+
+                    {/* <Popup
                                             trigger={ */}
-                                                <Checkbox
-                                                    key='chaine_check_red'
-                                                    label='Hors SGCI'
-                                                    value='4'
-                                                    onChange={this.handlechange}
-                                                    checked={this.state.check['4']}
-                                            />
-                                        {/* }
+                    <Checkbox
+                      key="chaine_check_red"
+                      label="Hors SGCI"
+                      value="4"
+                      onChange={this.handlechange}
+                      checked={this.state.check["4"]}
+                    />
+                    {/* }
                                             content='Opérations impliquant un compte non logé à SGCI'
                                             inverted
                                         /> */}
-                                    </div>
-                                    <div className="row">
-                                        <Dropdown key='in_out' placeholder='Sens du flux' search defaultValue={this.state.sens}
-                                            selection onChange={this.SensonChange} fluid clearable options={in_out}/>
+                  </div>
+                  <div className="row">
+                    <Dropdown
+                      key="in_out"
+                      placeholder="Sens du flux"
+                      search
+                      defaultValue={this.state.sens}
+                      selection
+                      onChange={this.SensonChange}
+                      fluid
+                      clearable
+                      options={in_out}
+                    />
 
-                                        <Dropdown key='level' placeholder='Niveau' search defaultValue={this.state.level}
-                                            selection onChange={this.LevelonChange} fluid clearable options={level}/>
+                    <Dropdown
+                      key="level"
+                      placeholder="Niveau"
+                      search
+                      defaultValue={this.state.level}
+                      selection
+                      onChange={this.LevelonChange}
+                      fluid
+                      clearable
+                      options={level}
+                    />
 
-                                        <Dropdown key='choice' placeholder='Choix du filtre' search defaultValue={this.state.choice}
-                                            selection onChange={this.ChoiceonChange} fluid  options={choice}/>
-                                    </div><br/>
-                                    <div className='row'>
-                                        <ReactSlider
-                                            defaultValue={this.state.range}
-                                            onChange={this.handleRangechange}
-                                            className="horizontal-slider"
-                                            thumbClassName="example-thumb"
-                                            trackClassName="example-track"
-                                            renderThumb={(props, state) => <div style={{'backgroundColor':'#333'}} {...props}>{state.valueNow}</div>}
-                                        />
-                                    </div><br/>
-                                    {/* <div className='row'>
+                    <Dropdown
+                      key="choice"
+                      placeholder="Choix du filtre"
+                      search
+                      defaultValue={this.state.choice}
+                      selection
+                      onChange={this.ChoiceonChange}
+                      fluid
+                      options={choice}
+                    />
+                  </div>
+                  <br />
+                  <div className="row">
+                    <ReactSlider
+                      defaultValue={this.state.range}
+                      onChange={this.handleRangechange}
+                      className="horizontal-slider"
+                      thumbClassName="example-thumb"
+                      trackClassName="example-track"
+                      renderThumb={(props, state) => (
+                        <div style={{ backgroundColor: "#333" }} {...props}>
+                          {state.valueNow}
+                        </div>
+                      )}
+                    />
+                  </div>
+                  <br />
+                  {/* <div className='row'>
                                         <input type="date" locale="fr-FR" onChange={this.PickeronChange1}/>
                                     </div><br/>
                                     <div className='row'>
                                         <input type="date" locale="fr-FR" onChange={this.PickeronChange2}/>
                                     </div><br/> */}
-                                    <div className='row'>
-                                        <Button color='green' onClick={this.handleRunClick}>Lancer</Button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>                           
-                    <>
-                        <Modal open={this.state.open}>
-                            { 
-                                <Modal.Header>
-                                    {this.state.label[this.state.sourc]}   -------  {this.state.label[this.state.targ]} : {this.state.montant} XOF
-                                </Modal.Header>
-                            }
-                            <Modal.Content>
-                                <div className='row'>
-                                    <div className='col-md-6'>
-                                        <input type="date" locale="fr-FR" onChange={this.PickeronChange1}/>
-                                    </div>
-                                    <div className='col-md-6'>
-                                        <input type="date" locale="fr-FR" onChange={this.PickeronChange2}/>
-                                    </div>
-                                </div><br/>
-                                <ReactTable
-                                    data={this.state.operation_rows} filterable
-                                    defaultFilterMethod={(filter, row) =>
-                                        String(row[filter.id]).includes(filter.value)}
-                                    columns={this.state.operation_columns}
-                                    defaultPageSize={20} style={{ height: "auto"}} className="-striped -highlight"
-                                />
-                            </Modal.Content>
-                            <Modal.Actions>
-                                <Button onClick={this.openfct} color='red'>Fermer</Button>
-                            </Modal.Actions>
-                        </Modal>
-                    </>                            
+                  <div className="row">
+                    <Button color="green" onClick={this.handleRunClick}>
+                      Lancer
+                    </Button>
+                  </div>
                 </div>
-            </>
-        )
-    }
+              </div>
+            </div>
+          </div>
+          <>
+            <Modal open={this.state.open}>
+              {
+                <Modal.Header>
+                  {this.state.label[this.state.sourc]} --{" "}
+                  {this.state.label[this.state.targ]} : {this.state.montant} XOF
+                </Modal.Header>
+              }
+              <Modal.Content>
+                <div className="row">
+                  <div className="col-md-6">
+                    <input
+                      type="date"
+                      locale="fr-FR"
+                      onChange={this.PickeronChange1}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <input
+                      type="date"
+                      locale="fr-FR"
+                      onChange={this.PickeronChange2}
+                    />
+                  </div>
+                </div>
+                <br />
+                <ReactTable
+                  data={this.state.operation_rows}
+                  filterable
+                  defaultFilterMethod={(filter, row) =>
+                    String(row[filter.id]).includes(filter.value)
+                  }
+                  columns={this.state.operation_columns}
+                  defaultPageSize={20}
+                  style={{ height: "auto" }}
+                  className="-striped -highlight"
+                />
+              </Modal.Content>
+              <Modal.Actions>
+                <Button onClick={this.openfct} color="red">
+                  Fermer
+                </Button>
+              </Modal.Actions>
+            </Modal>
+          </>
+        </div>
+      </>
+    );
+  }
 }
 
-export default withAuth() (Graph_chaine);
-
-
-{
-  "data": [
-    {
-      "data": {
-        "rows": [
-          {
-            "CLI_Emet": 116317874,
-            "CLI_S": 711999992,
-            "perc_emet": 0.035864197026549416,
-            "perc_recep": 0.011497036090731555,
-            "CLI_Emet_Provi_Stage_Code": 3,
-            "CLI_S_Provi_Stage_Code": 1,
-            "Montant": 131650
-          },
-          {
-            "CLI_Emet": 500480335,
-            "CLI_S": 711999992,
-            "perc_emet": 0.03326606822265643,
-            "perc_recep": 0.011837624322815514,
-            "CLI_Emet_Provi_Stage_Code": 1,
-            "CLI_S_Provi_Stage_Code": 1,
-            "Montant": 135550
-          },
-          {
-            "CLI_Emet": 500492210,
-            "CLI_S": 711999992,
-            "perc_emet": 0.015770263462295743,
-            "perc_recep": 0.011986085859877751,
-            "CLI_Emet_Provi_Stage_Code": 2,
-            "CLI_S_Provi_Stage_Code": 1,
-            "Montant": 137250
-          },
-          {
-            "CLI_Emet": 500014573,
-            "CLI_S": 711999992,
-            "perc_emet": 0.13989847092844693,
-            "perc_recep": 0.0121083483021643,
-            "CLI_Emet_Provi_Stage_Code": 1,
-            "CLI_S_Provi_Stage_Code": 1,
-            "Montant": 138650
-          },
-          {
-            "id": "500632301",
-            "label": "SOCIETE CIVILE IMMOBILIERE FIRST",
-            "color": "#0b7a46",
-            "shape": "dot",
-            "size": 10,
-            "x": 722.195703417157,
-            "y": 294.53445710022464,
-            "group": 7
-          },
-          {
-            "id": "500622745",
-            "label": "IVOIRE SIGNALISATIONS ET TRAVAUX DIVERS",
-            "color": "#0b7a46",
-            "shape": "dot",
-            "size": 10,
-            "x": 618.4029229119365,
-            "y": 777.0593932051363,
-            "group": 8
-          },
-          {
-            "id": "500207834",
-            "label": "COTE D'IVOIRE ENERGIES",
-            "color": "#0b7a46",
-            "shape": "dot",
-            "size": 10,
-            "title": "Encours : 63.832.182.735",
-            "x": 177.3270676986634,
-            "y": 288.98925508626724,
-            "group": 9
-          },
-          {
-            "id": "500356829",
-            "label": "SOCIETE IVOIRIENNE DE PACKAGING",
-            "color": "#0b7a46",
-            "shape": "dot",
-            "size": 10,
-            "title": "Encours : 1.289.509.989",
-            "x": 299.5050501517114,
-            "y": 727.0519384323874,
-            "group": 10
-          },
-          {
-            "id": "500476596",
-            "label": "PHAMAM BROKER COTE D'IVOIRE",
-            "color": "#0b7a46",
-            "shape": "dot",
-            "size": 10,
-            "title": "Encours : 16.062.676",
-            "x": 268.38750531148753,
-            "y": 524.5632529810385,
-            "group": 11
-          },
-          {
-            "id": "500404313",
-            "label": "VILLEBRUN AYMERIC MARIE GHISLAIN OU WAGNER EPSE VILLEBRUN ELISA",
-            "color": "#0b7a46",
-            "shape": "dot",
-            "size": 10,
-            "x": 285.0997780374251,
-            "y": 440.7617571072356,
-            "group": 12
-          },
-          {
-            "id": "500605600",
-            "label": "JEBEILI AND COMPANY",
-            "color": "#0b7a46",
-            "shape": "dot",
-            "size": 10,
-            "title": "Encours : 511.500.000",
-            "x": 930.6649584734232,
-            "y": 677.6252206625489,
-            "group": 13
-          },
-          {
-            "id": "500014573",
-            "label": "NLLE AFRIQUE INDUSTRIE",
-            "color": "#0b7a46",
-            "shape": "dot",
-            "size": 10,
-            "x": 72.26366670906877,
-            "y": 225.23626977920512,
-            "group": 14
-          },
-          {
-            "id": "500492210",
-            "label": "ANAÏSA",
-            "color": "orange",
-            "shape": "dot",
-            "size": 10,
-            "title": "Encours : 52.577.983",
-            "x": 541.683633845607,
-            "y": 260.7945458823788,
-            "group": 15
-          },
-          {
-            "id": "500480335",
-            "label": "ARTEMIS CONSTRUCTION ET TRAVAUX",
-            "color": "#0b7a46",
-            "shape": "dot",
-            "size": 10,
-            "title": "Encours : 28.316.572",
-            "x": 457.90110148618567,
-            "y": 630.6739315965252,
-            "group": 16
-          },
-          {
-            "id": "500018100",
-            "label": "AFRICAN DISTRIBUTION COMPANY",
-            "color": "#0b7a46",
-            "shape": "dot",
-            "size": 10,
-            "title": "Encours : 1.838.629.923",
-            "x": 276.7012037661284,
-            "y": 443.4691505703173,
-            "group": 17
-          },
-          {
-            "id": "500360085",
-            "label": "INGENIERIE INDUSTRIELLE ET PETROLIERE",
-            "color": "#0b7a46",
-            "shape": "dot",
-            "size": 10,
-            "x": 659.5310258241133,
-            "y": 252.55817755050123,
-            "group": 18
-          },
-          {
-            "id": "116317874",
-            "label": "SHELEC",
-            "color": "red",
-            "shape": "dot",
-            "size": 10,
-            "title": "Encours : 242.936.251",
-            "x": 917.7132107661479,
-            "y": 149.15510345525635,
-            "group": 19
-          },
-          {
-            "id": "711999992",
-            "label": "CHEQUES A PAYER",
-            "color": "#036ca7",
-            "shape": "dot",
-            "size": 10,
-            "x": 429.3578743290622,
-            "y": 131.71270020023996,
-            "group": 0
-          }
-        ],
-        "color": {
-          "111002093": "#0b7a46",
-          "111272112": "#0b7a46",
-          "111305422": "#0b7a46",
-          "111692001": "#0b7a46",
-          "111832203": "#0b7a46",
-          "116303511": "#0b7a46",
-          "116304377": "#0b7a46",
-          "116317874": "red",
-          "116331696": "#0b7a46",
-          "119340949": "#0b7a46",
-          "119341196": "#0b7a46",
-          "431300252": "#0b7a46",
-          "500014573": "#0b7a46",
-          "500018100": "#0b7a46",
-          "500019385": "#0b7a46",
-          "500033964": "#0b7a46",
-          "500041289": "#0b7a46",
-          "500041903": "orange",
-          "500042135": "#0b7a46",
-          "500072575": "orange",
-          "500090835": "#0b7a46",
-          "500133912": "#0b7a46",
-          "500169259": "red",
-          "500183251": "#0b7a46",
-          "500189104": "#0b7a46",
-          "500193864": "red",
-          "500207834": "#0b7a46",
-          "500209389": "#0b7a46",
-          "500222879": "red",
-          "500229767": "#0b7a46",
-          "500375126": "#0b7a46",
-          "500401100": "#0b7a46",
-          "500404313": "#0b7a46",
-          "500423790": "#0b7a46",
-          "500437851": "#0b7a46",
-          "500444270": "#0b7a46",
-          "500444456": "#0b7a46",
-          "500449045": "red",
-          "500452875": "#0b7a46",
-          "500454016": "#0b7a46",
-          "500465820": "#0b7a46",
-          "500466027": "#0b7a46",
-          "500474017": "#0b7a46",
-          "500476596": "#0b7a46",
-          "500480335": "#0b7a46",
-          "500480727": "#0b7a46",
-          "500492210": "orange",
-          "500501721": "red",
-          "500522770": "orange",
-          "500524798": "#0b7a46",
-          "500526231": "#0b7a46",
-          "500545084": "#0b7a46",
-          "500547109": "#0b7a46",
-          "500549798": "#0b7a46",
-          "500554070": "#0b7a46",
-          "500561508": "#0b7a46",
-          "500576449": "#0b7a46",
-          "500583552": "#0b7a46",
-          "500600329": "red",
-          "500605590": "red",
-          "500605600": "#0b7a46",
-          "500606382": "#0b7a46",
-          "500610265": "red",
-          "500617503": "#0b7a46",
-          "500619115": "#0b7a46",
-          "500622745": "#0b7a46",
-          "500626419": "#0b7a46",
-          "500631903": "#0b7a46",
-          "500632301": "#0b7a46",
-          "500636495": "#0b7a46",
-          "500638843": "red",
-          "500639879": "red",
-          "500641392": "red",
-          "500650988": "#0b7a46",
-          "500657821": "#0b7a46",
-          "500670230": "#0b7a46",
-          "500674594": "#0b7a46",
-          "500688816": "#0b7a46",
-          "711000020": "#0b7a46",
-          "711000068": "#0b7a46",
-          "711999992": "#036ca7"
-        },
-        "label": {
-          "111002093": "SOCIETE GENERALE CAPITAL SECURITIES",
-          "111272112": "DIVERSES VALEURS RECUES DF",
-          "111305422": "ALLIANZ COTE D'IVOIRE ASSURANCES",
-          "111692001": "POLICE NATIONALE",
-          "111832203": "SOCIÉTÉ GÉNÉRALE CAPITAL ASSET MANAGEMENT WEST AFRICA",
-          "116303511": "ALL-GRO",
-          "116304377": "SOGELUX",
-          "116317874": "SHELEC",
-          "116331696": "RIMCO-SETACI",
-          "119340949": "ADAM AFRIQUE",
-          "119341196": "CIMA CENTRE D'IMAGERIE MEDICALE ABI",
-          "431300252": "S I P E F CI",
-          "500014573": "NLLE AFRIQUE INDUSTRIE",
-          "500018100": "AFRICAN DISTRIBUTION COMPANY",
-          "500019385": "COCOA EXPORT COTE D'IVOIRE",
-          "500033964": "SPA-IMPEX/CI",
-          "500041289": "ETEIFA EXPERTISES",
-          "500041903": "GROUPE EKM",
-          "500042135": "CENTRALE D'ACHAT DE PRODUITS AGRICOLES",
-          "500072575": "ICM NAUTICAL",
-          "500090835": "SOCIETE GENERALE COTE D'IVOIRE",
-          "500133912": "DIVERS VIREMENTS RECUS",
-          "500169259": "SOCIETE DE DISTRIBUTION  ET DE TRAVAUX",
-          "500183251": "IMPROCI",
-          "500189104": "FABRICATION IVOIRIENNE DE PLASTIQUE",
-          "500193864": "LES TERRES DU SUD",
-          "500207834": "COTE D'IVOIRE ENERGIES",
-          "500209389": "FLEXIBLE PACKAGING COTE D'IVOIRE",
-          "500222879": "CARTE D'OR COTE D'IVOIRE",
-          "500229767": "VERGERS DU BANDAMA",
-          "500250510": "QUANG THIEN IMEX",
-          "500261459": "DATA TECHNOLOGIE",
-          "500265955": "AGBAOU GOLD OPERATIONS",
-          "500274235": "SOCIETE DE DISTRIBUTION DE PRODUITS ALIMENTAIRES",
-          "500279146": "COTE D'IVOIRE COMMERCE IMPRIMERIE ET TRANSIT",
-          "500289072": "SOCIETE AFRICAINE DE PETROLE ET D'HYDROCABURE RAFFINES",
-          "500293570": "CABINET ELITES SARL",
-          "500308741": "FANAN & MAMADOU GENERAL SERVICES",
-          "500319460": "SOCIETE D'USINAGE, DE TRANSFORMATION ET D'EXPORTATION DE CAFE-CACAO",
-          "500323667": "SOCIETE DES PLANTEURS DE DJIBOUA",
-          "500323766": "EKYL SARL",
-          "500346796": "SAFFRON ELECTRONICS",
-          "500353676": "LIKA",
-          "500356614": "BERECAPHARMA",
-          "500356829": "SOCIETE IVOIRIENNE DE PACKAGING",
-  
-          "500401100": "LASSIRE INDUSTRIE",
-          "500404313": "VILLEBRUN AYMERIC MARIE GHISLAIN OU WAGNER EPSE VILLEBRUN ELISA",
-          "500423790": "SOCIETE GENERALE AFRIQUE DE L'OUEST",
-          "500437851": "SCOOPS-IPH",
-          "500444270": "STE TRANSAKO",
-          "500444456": "COMPAGNIE CACAOYERE DU BANDAMA",
-          "500449045": "SANATA DISTRIBUTION",
-          "500452875": "MULTIPACK",
-          "500454016": "SOCIETE COOPERATIVE AGRICOLE POUR LE DEVELOPPEMENT DE SASSANDRA",
-          "500465820": "SAFECHAF",
-          "500466027": "IVOIRE TRANSPORT",
-          "500474017": "IVORY COCOA PRODUCTS",
-          "500476596": "PHAMAM BROKER COTE D'IVOIRE",
-          "500480335": "ARTEMIS CONSTRUCTION ET TRAVAUX",
-          "500480727": "COMITE D'ENTREPRISE SOCIETE GENERALE COTE D'IVOIRE",
-          "500492210": "ANAÏSA",
-          "500501721": "ELECTRICITE GENERALE ET INDUSTRIELLE",
-          "500522770": "METAL DE COTE D'IVOIRE",
-          "500524798": "SF RECOVERY",
-          "500526231": "AFRIQ OIL SA",
-          "500545084": "AFRICAN NEW FUEL SARL.U",
-          "500547109": "LA COMPAGNIE DES CAOUTCHOUCS",
-          "500549798": "SOCIETE COOPERATIVE DES AGRICULTEURS",
-          "500554070": "BUILDING ENTERPRISE SECURITY & TECHNOLOGIES AFRICA LIMITED",
-          "500561508": "SOCIETE AWAHUS SERVICE",
-          "500576449": "AGENCE NATIONALE DE GESTION DES DECHETS",
-          "500583552": "HIGH STAR SECURITY",
-          "500600329": "INFAILLIBLE GOGOUA SERVICES",
-          "500605590": "COMPAGNIE IVOIRIENNE D'ARTICLES DE MÉNAGE",
-          "500605600": "JEBEILI AND COMPANY",
-          "500606382": "SOCIETE DE CONDITIONNEMENT DE CAFE C",
-          "500610265": "DANAYA COMPAGNIE SARL",
-          "500617503": "TAHI & FILS COMMODITIES SAR",
-          "500619115": "DUMONTHEIL YANN ROBIN",
-          "500622745": "IVOIRE SIGNALISATIONS ET TRAVAUX DIVERS",
-          "500626419": "CYRIAN INTERNATIONAL SA",
-          "500631903": "SOCIETE COOPERATIVE ELITES POUR LA PROMOTION DES PRODUITS AGRICOLES",
-          "500632301": "SOCIETE CIVILE IMMOBILIERE FIRST",
-          "500636495": "OTOMASYS SARL",
-          "500638843": "BOSSON YVES LOBOGNON CAROLLE KANGA",
-          "500639879": "OMEGA SARL",
-          "500641392": "HUILERIE INDUSTRIELLE DE BONOUA",
-          "500650988": "AFRICAINE DE REFRIGERATION INDUSTRIELLE ET CLIMATISATION",
-          "500657821": "KINEDEN COMMODITIES SA",
-          "500670230": "SOCIETE CIVILE PARTICULIERE AMK",
-          "500674594": "EDIS NOUVELLE",
-          "500688816": "GASPEC SARL",
-          "711000020": "SALAIRES ORGANISMES",
-          "711000068": "REGLEMENT FOURNISSEUR",
-          "711999992": "CHEQUES A PAYER"
-        },
-        "edges": [
-          {
-            "title": "500372011: 0.93%  ----> 711999992: 53.0% ",
-            "font": {
-              "align": "top",
-              "color": "red"
-            },
-            "from": "500372011",
-            "to": "711999992",
-            "arrows": "to",
-            "color": {
-              "inherit": "from"
-            },
-            "id": "500372011_711999992_edge",
-            "text": "text"
-          },
-          {
-            "title": "500169259: 0.02%  ----> 711999992: 0.0% ",
-            "font": {
-              "align": "top",
-              "color": "red"
-            },
-            "from": "500169259",
-            "to": "711999992",
-            "arrows": "to",
-            "color": {
-              "inherit": "from"
-            },
-            "id": "500169259_711999992_edge",
-            "text": "text"
-          },
-          {
-            "title": "500356614: 4.62%  ----> 711999992: 0.0% ",
-            "font": {
-              "align": "top",
-              "color": "red"
-            },
-            "from": "500356614",
-            "to": "711999992",
-            "arrows": "to",
-            "color": {
-              "inherit": "from"
-            },
-            "id": "500356614_711999992_edge",
-            "text": "text"
-          },
-        
-          {
-            "title": "500638843: 100.0%  ----> 711999992: 0.0% ",
-            "font": {
-              "align": "top",
-              "color": "red"
-            },
-            "from": "500638843",
-            "to": "711999992",
-            "arrows": "to",
-            "color": {
-              "inherit": "from"
-            },
-            "id": "500638843_711999992_edge",
-            "text": "text"
-          },
-          {
-            "title": "500583552: 0.03%  ----> 711999992: 0.0% ",
-            "font": {
-              "align": "top",
-              "color": "red"
-            },
-            "from": "500583552",
-            "to": "711999992",
-            "arrows": "to",
-            "color": {
-              "inherit": "from"
-            },
-            "id": "500583552_711999992_edge",
-            "text": "text"
-          },
-          {
-            "title": "500452875: 0.0%  ----> 711999992: 0.0% ",
-            "font": {
-              "align": "top",
-              "color": "red"
-            },
-            "from": "500452875",
-            "to": "711999992",
-            "arrows": "to",
-            "color": {
-              "inherit": "from"
-            },
-            "id": "500452875_711999992_edge",
-            "text": "text"
-          },
-          {
-            "title": "711000020: 0.0%  ----> 711999992: 0.0% ",
-            "font": {
-              "align": "top",
-              "color": "red"
-            },
-            "from": "711000020",
-            "to": "711999992",
-            "arrows": "to",
-            "color": {
-              "inherit": "from"
-            },
-            "id": "711000020_711999992_edge",
-            "text": "text"
-          },
-          {
-            "title": "116317874: 0.04%  ----> 711999992: 0.0% ",
-            "font": {
-              "align": "top",
-              "color": "red"
-            },
-            "from": "116317874",
-            "to": "711999992",
-            "arrows": "to",
-            "color": {
-              "inherit": "from"
-            },
-            "id": "116317874_711999992_edge",
-            "text": "text"
-          }
-        ],
-        "text": {},
-        "montant": {
-          "111002093_711999992_edge": "4.905.290",
-          "116303511_711999992_edge": "182.150",
-          "116304377_711999992_edge": "149.550",
-          "116317874_711999992_edge": "131.650",
-          "116331696_711999992_edge": "186.700",
-          "119340949_711999992_edge": "970.150",
-          "119341196_711999992_edge": "148.950",
-          "431300252_711999992_edge": "306.400",
-          "500014573_711999992_edge": "138.650",
-          "500018100_711999992_edge": "134.850",
-          "500019385_711999992_edge": "215.950",
-          "500033964_711999992_edge": "274.400",
-          "500041289_711999992_edge": "157.250",
-          "500041903_711999992_edge": "607.000",
-          "500042135_711999992_edge": "269.000"
-    
-        },
-        "solde": "null",
-        "date": "string"
-      }
-    }
-  ],
-  "code": 200,
-  "message": "client graph data."
-}
+export default withAuth()(Graph_chaine);
