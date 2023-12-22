@@ -1,3 +1,380 @@
+--------stepers----
+import React, { useState } from "react";
+import axios from "axios";
+import Client from "./clientInfo";
+import {
+  Box,
+  Grid,
+  Button,
+  Stepper,
+  Typography,
+  StepButton,
+  Step,
+  AccordionDetails,
+  Accordion,
+  AccordionSummary,
+} from "@material-ui/core";
+import Descriptifs from "./engagement";
+import { Alert, AlertTitle } from "@mui/lab";
+import BeforeDescriptif from "./beforeDescriptif";
+import AfterDescriptif from "./afterDescriptifs";
+import ControlEligibilite from "./Control";
+import SkipNextIcon from "@material-ui/icons/SkipNext";
+import SkipPreviousIcon from "@material-ui/icons/SkipPrevious";
+import CheckCircleIcon from "@material-ui/icons/CheckCircle";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import RotateLeftIcon from "@material-ui/icons/RotateLeft";
+import { getCookie } from "../../context/UserContext";
+
+export default function HorizontalNonLinearStepper() {
+  function getSteps() {
+    return [
+      "Controle eligibilite",
+      "Descriptifs avant la demande",
+      "Descriptifs après la demande",
+      "Details des nouvelles autorisations",
+    ];
+  }
+
+  function getStepContent(step) {
+    switch (step) {
+      case 0:
+        return <ControlEligibilite props={clientProps} />;
+      case 1:
+        return <BeforeDescriptif props={clientProps} />;
+      case 2:
+        return <AfterDescriptif props={clientProps} />;
+      case 3:
+        return <Descriptifs props={clientProps} />;
+      default:
+        return "Unknown step";
+    }
+  }
+  const [activeStep, setActiveStep] = React.useState(0);
+  const [completed, setCompleted] = React.useState({});
+  const steps = getSteps();
+
+  const totalSteps = () => {
+    return steps.length;
+  };
+
+  const completedSteps = () => {
+    return Object.keys(completed).length;
+  };
+
+  const isLastStep = () => {
+    return activeStep === totalSteps() - 1;
+  };
+
+  const allStepsCompleted = () => {
+    return completedSteps() === totalSteps();
+  };
+
+  const handleNext = () => {
+    const newActiveStep =
+      isLastStep() && !allStepsCompleted()
+        ? steps.findIndex((step, i) => !(i in completed))
+        : activeStep + 1;
+    setActiveStep(newActiveStep);
+  };
+
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+  const handleStep = (step) => () => {
+    setActiveStep(step);
+  };
+
+  const handleComplete = () => {
+    const newCompleted = completed;
+    newCompleted[activeStep] = true;
+    setCompleted(newCompleted);
+    handleNext();
+  };
+
+  const handleReset = () => {
+    setActiveStep(0);
+    setCompleted({});
+  };
+
+  const [matricule, setMatricule] = useState("");
+  const [clientData, setClientData] = useState({});
+  const [before, setBefore] = useState([]);
+  const [summary, setSummary] = useState({});
+  const [controlEligibilte, setControlEligibilte] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [load, setLoad] = useState(false);
+  const [error, setError] = useState("");
+  const [inputValue, setInputValue] = useState(false);
+
+  const handleGetClientInfo = async () => {
+    if (matricule === "") {
+      setInputValue(true);
+    } else {
+      setInputValue(false);
+    }
+    setLoading(true);
+
+    await axios
+      .post(
+        "/api/commitment/client/knowledge",
+        { number_client: matricule },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": getCookie("csrf_refresh_token"),
+          },
+        },
+      )
+      .then((response) => {
+        console.log("reponse de l'api client: ", response);
+        const data = response.data.data;
+        setClientData((prev) => ({
+          ...prev,
+          ...data,
+        }));
+      })
+      .catch((error) => {
+        console.log("Error lors du traitement:", error);
+        setError(error.response?.data || "Oups!!!! une erreur s'est produite");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  const handleSummary = async () => {
+    setLoading(true);
+    await axios
+      .post(
+        "/api/commitment/summary",
+        { number_client: matricule },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": getCookie("csrf_refresh_token"),
+          },
+        },
+      )
+      .then((response) => {
+        console.log("reponse de summary: ", response);
+        const data = response.data.data;
+        setSummary((prev) => ({
+          ...prev,
+          ...data,
+        }));
+      })
+      .catch((error) => {
+        console.log("Error lors du traitement:", error);
+        setError(error.response?.data || "Oups!!!! une erreur s'est produite");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  const handleBeforInside = async () => {
+    setLoading(true);
+    // const accessToken = localStorage.getItem('accessToken')
+    await axios
+      .post(
+        "/api/commitment/before_insight",
+        { number_client: matricule },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": getCookie("csrf_refresh_token"),
+          },
+        },
+      )
+      .then((response) => {
+        console.log("reponse de l'api before_insight: ", response);
+        const data = response.data.data;
+        setBefore(data);
+        if (response.status === 206) {
+          setError("pas de message");
+        }
+      })
+      .catch((error) => {
+        console.log("Error lors du traitement de before inside:", error);
+        setError(error.response?.data || "Oups!!!! une erreur s'est produite");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+  const handleControlEligibite = async () => {
+    setLoading(true);
+    // const accessToken = localStorage.getItem('accessToken')
+    await axios
+      .post(
+        "/api/panel/eligibility",
+        { number_client: matricule },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": getCookie("csrf_refresh_token"),
+          },
+        },
+      )
+      .then((response) => {
+        console.log("reponse de l'api control eligibilité: ", response);
+        const data = response.data.data;
+
+        setControlEligibilte((prev) => ({
+          ...prev,
+          ...data,
+        }));
+      })
+      .catch((error) => {
+        console.log("Error lors du traitement de control eligibilité:", error);
+        setError(error.response?.data || "Oups!!!! une erreur s'est produite");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  const handleSendInside = async (datas) => {
+    setLoading(true);
+    const newData = datas.filter((row) => row.isModified);
+    await axios
+      .post("/api/commitment/before_insight/set", newData, {
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN": getCookie("csrf_refresh_token"),
+        },
+      })
+      .then((response) => {
+        console.log("reponse de l'api before_insight_set: ", response);
+        const data = response;
+      })
+      .catch((error) => {
+        console.log("Error lors du traitement de before inside:", error);
+        setError(error.response?.data || "Oups!!!! une erreur s'est produite");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  const handleChangeInput = (e) => {
+    setMatricule(e.target.value);
+  };
+
+  const handleClient = async () => {
+    await handleGetClientInfo();
+    await handleBeforInside();
+    await handleSummary();
+    await handleControlEligibite();
+  };
+
+  const clientProps = {
+    matricule,
+    setMatricule,
+    clientData,
+    summary,
+    setSummary,
+    error,
+    setError,
+    inputValue,
+    setInputValue,
+    setClientData,
+    handleSendInside,
+    loading,
+    setLoading,
+    handleGetClientInfo,
+    handleBeforInside,
+    handleSummary,
+    handleControlEligibite,
+    controlEligibilte,
+    handleChangeInput,
+    handleClient,
+    load,
+    setLoad,
+    setBefore,
+    before,
+  };
+
+  return (
+    <Grid className="App">
+      <Accordion style={{ backgroundColor: "#006064" }}>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel1a-content"
+          id="panel1a-header"
+        >
+          <Typography style={{ color: "white" }}>
+            <b>INFORMATION DU CLIENT</b>
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Client props={clientProps} />
+        </AccordionDetails>
+      </Accordion>
+      <Box sx={{ width: "100%", my: "1rem" }}>
+        <Stepper nonLinear activeStep={activeStep}>
+          {steps.map((label, index) => (
+            <Step key={label}>
+              <StepButton
+                onClick={handleStep(index)}
+                completed={completed[index]}
+              >
+                {label}
+              </StepButton>
+            </Step>
+          ))}
+        </Stepper>
+      </Box>
+      <div>
+        {allStepsCompleted() ? (
+          <div>
+            <Typography>
+              <Alert severity="success">
+                <AlertTitle>Felicitation</AlertTitle>
+                <strong> Credapp creer avec succès!!!!!</strong>
+              </Alert>
+            </Typography>
+            <Button onClick={handleReset}>
+              <RotateLeftIcon />
+            </Button>
+          </div>
+        ) : (
+          <div>
+            <Typography>{getStepContent(activeStep)}</Typography>
+
+            <Box display="flex" justifyContent="space-between">
+              <Button
+                style={{ color: "red", marginTop: "20px" }}
+                variant="contained"
+                disabled={activeStep === 0}
+                onClick={handleBack}
+                type="primary"
+              >
+                <SkipPreviousIcon style={{ color: "red" }} />
+              </Button>
+              <Button
+                variant="contained"
+                style={{ color: "green", marginTop: "20px" }}
+                onClick={handleComplete}
+              >
+                {completedSteps() === totalSteps() - 1 ? (
+                  <CheckCircleIcon style={{ color: "green" }} />
+                ) : (
+                  <SkipNextIcon style={{ color: "#1b5e20" }} />
+                )}
+              </Button>
+            </Box>
+          </div>
+        )}
+      </div>
+    </Grid>
+  );
+}
+
+
+
 
 import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
