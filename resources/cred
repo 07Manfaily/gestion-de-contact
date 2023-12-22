@@ -355,3 +355,67 @@ export default AfterDescriptif;
 
 
 
+
+
+// ... (votre import et votre code existant)
+
+const AfterDescriptif = ({ props }) => {
+  // ... (votre code existant)
+
+  const handleFormSubmit = async (values) => {
+    const parsedValues = {
+      title: values["Nature de ligne"],
+      account_number: values["Numero compte"],
+      autorisation_amount: numStr(values["Autorisation"]) || 0,
+      outstanding_amount: numStr(values["En cours"]) || 0,
+      devise: values["Devise"],
+      maturity_date: values["Délais de maturité"],
+    };
+
+    if (editRow) {
+      const newData = data.map((line) =>
+        line === editRow ? { ...line, ...parsedValues } : line
+      );
+      setData(newData);
+    } else {
+      setData([...data, parsedValues]);
+    }
+
+    handleModalClose();
+  };
+
+  const sendUpdatedDataToAPI = async () => {
+    try {
+      // Filter out any rows that haven't been modified
+      const modifiedData = data.filter((row) => row.isModified);
+
+      // Send modified data to the API
+      const response = await fetch("https://votre-api-endpoint", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(modifiedData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error sending modified data to the API");
+      }
+
+      // Clear the "isModified" flag for all rows
+      const updatedData = data.map((row) => ({ ...row, isModified: false }));
+      setData(updatedData);
+
+      console.log("Data sent to API successfully");
+    } catch (error) {
+      console.error("Error:", error.message);
+    }
+  };
+
+  return (
+    // ... (votre code existant)
+  );
+};
+
+export default AfterDescriptif;
+
