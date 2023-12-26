@@ -1,3 +1,360 @@
+----engagement----
+import React, { useState } from "react";
+import axios from "axios";
+import numStr from "../../components/utils/convertFloate";
+
+import {
+  Grid,
+  TextField,
+  TableContainer,
+  Table,
+  Paper,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Button,
+} from "@material-ui/core";
+
+import useStyles from "../dashboard/styles";
+
+// components
+import Widget from "../../components/Widget/Widget";
+import { getCookie } from "../../context/UserContext";
+import { format } from "date-fns";
+
+// data
+
+const Engagement = ({ props }) => {
+  var classes = useStyles();
+  const [value1, setValue1] = useState(null);
+  const [data, setData] = useState();
+  const [value2, setValue2] = useState(null);
+  const [value5, setValue5] = useState(null);
+  const [value7, setValue7] = useState(null);
+
+  const isValidNumber = (value) => {
+    return !isNaN(value) && isFinite(value);
+  };
+
+  const formDate = (MyDate) => {
+    const date = new Date(MyDate);
+
+    return format(date, "dd/MM/yyyy");
+  };
+
+  const handleChange1 = (e) => {
+    setValue1(parseFloat(e.target.value));
+  };
+
+  const handleChange2 = (e) => {
+    setValue2(parseFloat(e.target.value));
+  };
+
+  const handleChange5 = (e) => {
+    setValue5(parseFloat(e.target.value));
+  };
+
+  const handleChange7 = (e) => {
+    setValue7(parseFloat(e.target.value));
+  };
+
+   const handleSend = async () => {
+   setData({matricule:props.matricule, 1:value1, 2:value2, 3:value5, 4:value7});
+    const nouvelleDonnée = props.handleSendEngagement(data);
+    if (nouvelleDonnée) {
+      setData(nouvelleDonnée);
+    }
+  };
+
+  return (
+    <Grid item xs={12} md={12}>
+      <Widget
+        title="Engagement du client"
+        upperTitle
+        className={classes.card}
+        bodyClass={classes.fullHeightBody}
+      >
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 650 }} aria-label="caption table">
+            <caption>
+              {/* <Button
+                style={{
+                  color: "white",
+                  background: "green",
+                  marginTop: "20px",
+                }}
+                variant="contained"
+                onClick={handleSend}
+                type="primary"
+              >
+                VALIDER
+              </Button> */}
+            </caption>
+            <TableHead>
+              <TableRow>
+                <TableCell></TableCell>
+                <TableCell>
+                  <b>Autorisations précédentes</b>
+                </TableCell>
+                <TableCell>
+                  <b>Total Autorisations Solicités</b>
+                </TableCell>
+                <TableCell>
+                  <b>Variation</b>
+                </TableCell>
+                <TableCell>
+                  <b>%Variation</b>
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <TableRow>
+                <TableCell>
+                  <b style={{ color: "#b71c1c" }}>&lt;=1</b>
+                </TableCell>
+                <TableCell>
+                  {" "}
+                  <b style={{ color: "#283593" }}>
+                    {props.summary["1"] === null
+                      ? "---------"
+                      : numStr(props.summary["1"], " ")}{" "}
+                  </b>
+                </TableCell>
+                <TableCell>
+                  {" "}
+                  <TextField
+                    style={{
+                      backgroundColor: "#f5f5f5",
+                      border: "2",
+                      borderColor: "black",
+                    }}
+                    id="filled-basic"
+                    placeholder="........"
+                    variant="filled"
+                    value={value1}
+                    onChange={handleChange1}
+                    type="number"
+                  />
+                </TableCell>
+                <TableCell>
+                  {" "}
+                  <b style={{ color: "#283593" }}>
+                    {props.summary["1"] === null
+                      ? "---------"
+                      : numStr(
+                          isNaN(value1 - props.summary["1"])
+                            ? "----------------"
+                            : value1 - props.summary["1"],
+                        )}
+                  </b>
+                </TableCell>
+                <TableCell>
+                  {" "}
+                  <b style={{ color: "#283593" }}>
+                    {props.summary["1"] === null
+                      ? "---------"
+                      : isNaN(
+                          (
+                            ((value1 - props.summary["1"]) /
+                              props.summary["1"]) *
+                            100
+                          ).toFixed(2),
+                        )
+                      ? "-------"
+                      : (
+                          ((value1 - props.summary["1"]) / props.summary["1"]) *
+                          100
+                        ).toFixed(2)}{" "}
+                    %
+                  </b>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>
+                  <b style={{ color: "#b71c1c" }}>&lt;=2</b>
+                </TableCell>
+                <TableCell>
+                  {" "}
+                  <b style={{ color: "#283593" }}>
+                    {" "}
+                    {props.summary["2"] === null
+                      ? "---------"
+                      : numStr(props.summary["2"])}{" "}
+                  </b>
+                </TableCell>
+                <TableCell>
+                  {" "}
+                  <TextField
+                    value={value2}
+                    onChange={handleChange2}
+                    style={{ backgroundColor: "#f5f5f5", border: "2" }}
+                    id="filled-basic"
+                    placeholder="........"
+                    variant="filled"
+                    type="number"
+                  />
+                </TableCell>
+                <TableCell>
+                  {" "}
+                  <b style={{ color: "#283593" }}>
+                    {props.summary["2"] === null
+                      ? "---------"
+                      : numStr(
+                          isNaN(value2 - props.summary["2"])
+                            ? "----------------"
+                            : value2 - props.summary["2"],
+                        )}
+                  </b>
+                </TableCell>
+                <TableCell>
+                  {" "}
+                  <b style={{ color: "#283593" }}>
+                    {props.summary["2"] === null
+                      ? "---------"
+                      : isNaN(
+                          (
+                            ((value2 - props.summary["2"]) /
+                              props.summary["2"]) *
+                            100
+                          ).toFixed(2),
+                        )
+                      ? "-------"
+                      : (
+                          ((value2 - props.summary["2"]) / props.summary["2"]) *
+                          100
+                        ).toFixed(2)}{" "}
+                    %
+                  </b>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>
+                  <b style={{ color: "#b71c1c" }}>&lt;=5</b>
+                </TableCell>
+                <TableCell>
+                  {" "}
+                  <b style={{ color: "#283593" }}>
+                    {props.summary["5"] === null
+                      ? "---------"
+                      : numStr(props.summary["5"])}{" "}
+                  </b>
+                </TableCell>
+                <TableCell>
+                  {" "}
+                  <TextField
+                    value={value5}
+                    onChange={handleChange5}
+                    style={{ backgroundColor: "#f5f5f5", border: "2" }}
+                    id="filled-basic"
+                    placeholder="........"
+                    variant="filled"
+                    type="number"
+                  />
+                </TableCell>
+                <TableCell>
+                  {" "}
+                  <b style={{ color: "#283593" }}>
+                    {props.summary["5"] === null
+                      ? "---------"
+                      : numStr(
+                          isNaN(value5 - props.summary["5"])
+                            ? "----------------"
+                            : value5 - props.summary["5"],
+                        )}
+                  </b>
+                </TableCell>
+                <TableCell>
+                  {" "}
+                  <b style={{ color: "#283593" }}>
+                    {props.summary["5"] === null
+                      ? "---------"
+                      : isNaN(
+                          (
+                            ((value5 - props.summary["5"]) /
+                              props.summary["5"]) *
+                            100
+                          ).toFixed(2),
+                        )
+                      ? "-------"
+                      : (
+                          ((value5 - props.summary["5"]) / props.summary["5"]) *
+                          100
+                        ).toFixed(2)}{" "}
+                    %
+                  </b>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>
+                  <b style={{ color: "#b71c1c" }}>&lt;=7</b>
+                </TableCell>
+                <TableCell>
+                  {" "}
+                  <b style={{ color: "#283593" }}>
+                    {props.summary["7"] === null
+                      ? "---------"
+                      : numStr(value7 - props.summary["7"])}{" "}
+                  </b>
+                </TableCell>
+                <TableCell>
+                  {" "}
+                  <TextField
+                    value={value7}
+                    onChange={handleChange7}
+                    style={{ backgroundColor: "#f5f5f5", border: "2" }}
+                    id="filled-basic"
+                    placeholder="........"
+                    variant="filled"
+                    type="number"
+                  />
+                </TableCell>
+                <TableCell>
+                  {" "}
+                  <b style={{ color: "#283593" }}>
+                    {props.summary["7"] === null
+                      ? "---------"
+                      : numStr(
+                          isNaN(value7 - props.summary["7"])
+                            ? "----------------"
+                            : value7 - props.summary["7"],
+                        )}
+                  </b>
+                </TableCell>
+                <TableCell>
+                  {" "}
+                  <b style={{ color: "#283593" }}>
+                    {props.summary["7"] === null
+                      ? "---------"
+                      : isNaN(
+                          (
+                            ((value7 - props.summary["7"]) /
+                              props.summary["7"]) *
+                            100
+                          ).toFixed(2),
+                        )
+                      ? "-------"
+                      : (
+                          ((value7 - props.summary["7"]) / props.summary["7"]) *
+                          100
+                        ).toFixed(2)}{" "}
+                    %
+                  </b>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Widget>
+
+    </Grid>
+  );
+};
+
+export default Engagement;
+
+
+
 --------stepers----
 import React, { useState } from "react";
 import axios from "axios";
