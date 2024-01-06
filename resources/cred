@@ -1,3 +1,136 @@
+import React, { useState } from "react";
+// ... (importez les autres dépendances nécessaires)
+
+export default function WidgetAccordion({
+  title,
+  description1,
+  description2,
+  valueRadio,
+  val,
+  onRadioClick, // Ajoutez cette prop pour passer la fonction de gestion du clic sur les boutons radio
+}) {
+  const classes = useStyles();
+  const [MyComment, setMyComment] = useState("");
+
+  // Ajoutez une fonction pour gérer le clic sur les boutons radio
+  const handleRadioClick = (newValue) => {
+    // Appelez la fonction passée en prop avec la clé spécifique et la nouvelle valeur
+    onRadioClick(title, newValue);
+  };
+
+  return (
+    // ... (le reste du code du composant)
+
+    <FormControl>
+      <RadioGroup
+        row
+        aria-labelledby="demo-row-radio-buttons-group-label"
+        name="row-radio-buttons-group"
+      >
+        {valueRadio ? (
+          <>
+            <FormControlLabel
+              control={<Radio style={{ color: "red" }} />}
+              label="Non Ok"
+              onClick={() => handleRadioClick("Non Ok")}
+            />
+            <FormControlLabel
+              control={<Radio checked="true" style={{ color: "green" }} />}
+              label="Ok"
+              onClick={() => handleRadioClick("Ok")}
+            />
+          </>
+        ) : valueRadio === null ? (
+          <>
+            <FormControlLabel
+              control={<Radio style={{ color: "red" }} />}
+              label="Non Ok"
+              onClick={() => handleRadioClick("Non Ok")}
+            />
+            <FormControlLabel
+              control={<Radio style={{ color: "green" }} />}
+              label="Ok"
+              onClick={() => handleRadioClick("Ok")}
+            />
+          </>
+        ) : (
+          <>
+            <FormControlLabel
+              control={<Radio style={{ color: "red" }} />}
+              label="Non Ok"
+              onClick={() => handleRadioClick("Non Ok")}
+            />
+            <FormControlLabel
+              control={<Radio style={{ color: "green" }} />}
+              label="Ok"
+              onClick={() => handleRadioClick("Ok")}
+            />
+          </>
+        )}
+      </RadioGroup>
+    </FormControl>
+
+    // ... (le reste du code du composant)
+  );
+}
+
+
+
+
+import React from "react";
+import WidgetAccordion from "./WidgetAccordion";
+// ... (importez les autres dépendances nécessaires)
+
+export default function ControlEligibilite({ props }) {
+  // ... (le reste du code du composant)
+
+  // Fonction de gestion du clic sur les boutons radio
+  const handleRadioClick = (widgetTitle, radioValue) => {
+    // Envoyez les données au serveur en utilisant l'URL appropriée
+    const apiUrl = "/api/commitment/client/knowledge";
+    const postData = {
+      title: widgetTitle,
+      radioValue: radioValue,
+      // ... (ajoutez d'autres données si nécessaire)
+    };
+
+    // Utilisez axios ou fetch pour envoyer la requête POST
+    axios.post(apiUrl, postData)
+      .then(response => {
+        // Gérez la réponse du serveur ici
+        console.log(response.data);
+      })
+      .catch(error => {
+        // Gérez les erreurs ici
+        console.error("Erreur lors de l'envoi des données:", error);
+      });
+  };
+
+  return (
+    // ... (le reste du code du composant)
+    <WidgetAccordion
+      title={"KYC valide et fiche de contrôle conformité dûment remplie"}
+      description1={"Vérifier la date de validité du KYC du client"}
+      description2={
+        "Identifier le niveau de risque à partir de la classification FCCR"
+      }
+      valueRadio={
+        props.controlEligibilte.kyc_validity
+          ? props.controlEligibilte.kyc_validity.condition
+          : ""
+      }
+      val={props.controlEligibilte.kyc_validity.condition}
+      onRadioClick={handleRadioClick} // Passez la fonction de gestion du clic en prop
+    />
+    // ... (le reste du code du composant)
+  );
+}
+
+
+
+
+
+
 
 
 
@@ -221,16 +354,6 @@ export default function WidgetAccordion({
 }) {
   const classes = useStyles();
   const [MyComment, setMyComment] = useState("");
-  // const [radio, setRadio] = useState("");
-  // const [radio1, setRadio1] = useState("");
-  // const [radio2, setRadio2] = useState("");
-  // const [radio3, setRadio3] = useState("");
-  // const [radio4, setRadio4] = useState("");
-  // const [radio5, setRadio5] = useState("");
-  // const [radio6, setRadio6] = useState("");
-  // const [radio7, setRadio7] = useState("");
-  // const [radio8, setRadio8] = useState("");
-  // const [radio9, setRadio9] = useState("");
   return (
     <Accordion defaultExpanded>
       <AccordionSummary
@@ -341,35 +464,7 @@ export default function WidgetAccordion({
     </FormControl></div>
 {val === false ?  
 
-<img src={Invalid} style={{width:"40%", height:"50px"}} /> :"" }
-        {/* <Slider
-         value={value}
-       onChange={handleChangeSlide}
-       valueLabelDisplay="auto"
-       step={null}
-         marks={marks}
-         min={0}
-       max={100}
-         classes={{
-           markLabel: classes.Ok, // Set color for "En cours" label
-           markLabelActive: classes.nonOk, // Set color for "NON OK" label when active
-         }}
-        valueLabelDisplay="on"
-        valueLabelFormat={(value) => {
-          switch (value) {
-            case 0:
-              return <span className={classes.nonOk}>NON OK</span>;
-            case 50:
-              return <span className={classes.Ok}>Ok</span>;
-            case 100:
-               return <span className={classes.neutre}>Neutre</span>;
-            default:
-               return value;
-          }
-        }}
-       /> */}
-
-          
+<img src={Invalid} style={{width:"40%", height:"50px"}} /> :"" }          
         </div>
       </AccordionDetails>
       {/* <Divider />
