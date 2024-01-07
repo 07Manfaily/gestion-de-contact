@@ -1,3 +1,169 @@
+import React from "react";
+import { makeStyles } from "@material-ui/core/styles";
+import useStyles from "./styles";
+import WidgetAccordion from "./accordion";
+import { Grid } from "@material-ui/core";
+import { Divider } from '@material-ui/core';
+
+
+import Widget from "../../components/Widget/Widget";
+
+const ControlEligibilite = ({ props }) => {
+  const classes = useStyles();
+
+  return (
+ <Grid item xs={12} md={12}>
+   <Widget
+     title="	CONTROLES D’ELIGIBILITE A LA REVUE SIMPLIFIEE"
+     upperTitle
+     className={classes.card}
+     bodyClass={classes.fullHeightBody}
+   >
+    <div id="eligibility-criteria-container">
+   <Accordion defaultExpanded>
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
+        aria-controls="panel1c-content"
+        id="panel1c-header"
+      >
+        <div style={{ width: 500 }} className={classes.column}>
+          <Typography className={classes.heading}>
+            <b style={{ color: "blue" }}>CONTROLES D’ELIGIBILITE A LA REVUE SIMPLIFIEE"</b>
+          </Typography>
+          {MyComment.length > 0 ? (
+            <Typography className={classes.heading}>
+              <b style={{ color: "green" }}>
+                <CommentIcon />
+              </b>
+            </Typography>
+          ) : (
+            <Typography className={classes.heading}>
+              <b style={{ color: "red" }}>
+                <SpeakerNotesOffIcon />
+              </b>
+            </Typography>
+          )}
+        </div>
+      </AccordionSummary>
+      <AccordionDetails className={classes.details}>
+        <div style={{ width: 500 }} className={classes.column}>
+
+            <h3>
+              <b>Descriptif</b>
+            </h3>
+    
+          <ul>
+          
+              <li>
+                <i>
+                  <b>Vérifier la date de validité du KYC du client</b>{" "}
+                </i>
+              </li>
+            
+
+          
+              <li>
+                <i>
+                  <b>Identifier le niveau de risque à partir de la classification FCCR</b>{" "}
+                </i>
+              </li>
+           
+          </ul>
+         
+        </div>
+        <Divider
+          variant="inset"
+          style={{ marginRight: "20px" }}
+          orientation="vertical"
+          flexItem
+        />
+        <div
+          style={{ width: 500 }}
+          className={clsx(classes.column, classes.helper)}
+        >
+          <Typography variant="caption">
+            <form action="">
+              {" "}
+              <TextareaAutosize
+                name="comment"
+                value={MyComment}
+                onChange={(e) => setMyComment(e.target.value)}
+                style={{
+                  width: "97%",
+                  height: "80px",
+                  lineHeight: "1.2",
+                  padding: "8px 12px",
+                  borderRadius: "8px",
+                  margin: "8px",
+                }}
+                aria-label="empty textarea"
+                placeholder="Commentaire"
+              />
+            </form>
+          </Typography>
+        </div>
+        <Divider
+          variant="inset"
+          style={{ marginLeft: "22px" }}
+          orientation="vertical"
+          flexItem
+        />
+
+        <div
+          style={{ width: 500 }}
+          className={clsx(classes.column, classes.helper)}
+        >
+          <div style={{ marginLeft: "22px" }}>
+            {" "}
+            <FormControl>
+              <RadioGroup
+                row
+                aria-labelledby="demo-row-radio-buttons-group-label"
+                name="row-radio-buttons-group"
+              >
+               <RadioGroup
+                row
+                aria-labelledby="demo-row-radio-buttons-group-label"
+                name="row-radio-buttons-group"
+              >
+          <FormControlLabel
+                    value="NOK"
+                      control={<Radio style={{ color: "red" }} />}
+                      label="Non Ok"
+                  
+                    />
+                    <FormControlLabel
+                    value="OK"
+                      control={
+                        <Radio checked="true" style={{ color: "green" }} />
+                      }
+                      label="Ok"
+                      
+                    />
+                    </RadioGroup>
+              </RadioGroup>
+            </FormControl>
+          </div>
+     
+         
+        </div>
+      </AccordionDetails>
+    
+    </Accordion>
+     </div>
+   </Widget>
+ </Grid>
+  );
+};
+
+export default ControlEligibilite;
+
+
+
+
+
+
+
 import React, { useState } from "react";
 // ... (importez les autres dépendances nécessaires)
 
