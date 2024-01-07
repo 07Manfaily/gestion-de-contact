@@ -1,28 +1,3 @@
- <RadioGroup
-                          row
-                          aria-labelledby="demo-row-radio-buttons-group-label"
-                          name="row-radio-buttons-group"
-                        >
-                          <FormControlLabel
-                            value="NOK"
-                            control={<Radio checked={ props.controlEligibilte.kyc_validity.condition === true ? "false"
-                              : "false"} style={{ color: "red" }} />}
-                            label="Non Ok"
-                          />
-                          <FormControlLabel
-                            value="OK"
-                            control={
-                              <Radio
-                              checked={ props.controlEligibilte.kyc_validity.condition === true ? "true"
-                              : "false"}
-                                style={{ color: "green" }}
-                              />
-                            }
-                            label="Ok"
-                          />
-                        </RadioGroup>
-
-
 
 
 return (
