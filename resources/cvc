@@ -1,88 +1,79 @@
-json_data = [
-    {
-        "CLI_S": 500066619,
-        "CLI_Emet": 500477095.0,
-        "MontantXOF": 1020000.0
-    },
-    {
-        "CLI_S": 500066619,
-        "CLI_Emet": 500314452.0,
-        "MontantXOF": 2500000.0
-    },
-    {
-        "CLI_S": 500066619,
-        "CLI_Emet": 500282943.0,
-        "MontantXOF": 20000000.0
-    },
-    {
-        "CLI_S": 500066619,
-        "CLI_Emet": 500048670.0,
-        "MontantXOF": 1364500.0
-    },
-    {
-        "CLI_S": 500066619,
-        "CLI_Emet": 500066619.0,
-        "MontantXOF": 100.0
-    },
-    {
-        "CLI_S": 500066619,
-        "CLI_Emet": 711111110.0,
-        "MontantXOF": 2814600.0
-    },
-    {
-        "CLI_S": 500066619,
-        "CLI_Emet": 111305861.0,
-        "MontantXOF": 698700.0
-    },
-    {
-        "CLI_S": 500066619,
-        "CLI_Emet": 111310187.0,
-        "MontantXOF": 300000.0
-    },
-    {
-        "CLI_S": 500066619,
-        "CLI_Emet": 116330625.0,
-        "MontantXOF": 200000.0
-    }
-]
-
-
-import React from "react";
-import ReactDOM from "react-dom";
+import React, { useState } from "react";
 import Graph from "react-graph-vis";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogActions from "@mui/material/DialogActions";
+import Button from "@mui/material/Button";
 
+function GraphVis() {
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialogContent, setDialogContent] = useState("");
 
-function graphVis() {
+  // Votre JSON data
+  const json_data = [
+    {
+      "CLI_S": 500066619,
+      "CLI_Emet": 500477095.0,
+      "MontantXOF": 1020000.0
+  },
+  {
+      "CLI_S": 500066619,
+      "CLI_Emet": 500314452.0,
+      "MontantXOF": 2500000.0
+  },
+  {
+      "CLI_S": 500066619,
+      "CLI_Emet": 500282943.0,
+      "MontantXOF": 20000000.0
+  },
+  {
+      "CLI_S": 500066619,
+      "CLI_Emet": 500048670.0,
+      "MontantXOF": 1364500.0
+  },
+  {
+      "CLI_S": 500066619,
+      "CLI_Emet": 500066619.0,
+      "MontantXOF": 100.0
+  },
+  {
+      "CLI_S": 500066619,
+      "CLI_Emet": 711111110.0,
+      "MontantXOF": 2814600.0
+  },
+  {
+      "CLI_S": 500066619,
+      "CLI_Emet": 111305861.0,
+      "MontantXOF": 698700.0
+  },
+  {
+      "CLI_S": 500066619,
+      "CLI_Emet": 111310187.0,
+      "MontantXOF": 300000.0
+  },
+  {
+      "CLI_S": 500066619,
+      "CLI_Emet": 116330625.0,
+      "MontantXOF": 200000.0
+  }
+  ];
+
+  // Générez les nodes et edges à partir des données JSON
+  const nodes = json_data.map(item => ({
+    id: item.CLI_Emet,
+    label: item.CLI_Emet.toString(),
+    value: item.MontantXOF,
+    emet: true,
+    title: `MontantXOF: ${item.MontantXOF}`,
+  }));
+
+  const edges = json_data.map(item => ({ from: item.CLI_S, to: item.CLI_Emet, value: item.MontantXOF }));
+
   const graph = {
-    nodes : [
-        { id: 2, value: 10, label: "Alston" },
-        { id: 3, value: 12, label: "Barney" },
-        { id: 4, value: 16, label: "Coley" },
-        { id: 5, value: 17, label: "Grant" },
-        { id: 6, value: 15, label: "Langdon" },
-        { id: 7, value: 6, label: "Lee" },
-        { id: 8, value: 5, label: "Merlin" },
-        { id: 9, value: 30, label: "Mick" },
-        { id: 10, value: 8, label: "Tod" },
-      ],
-  
-      // create connections between people
-      // value corresponds with the amount of contact between two people
-      edges : [
-        { from: 2, to: 8, value: 3 },
-        { from: 2, to: 9, value: 5 },
-        { from: 2, to: 10, value: 1 },
-        { from: 4, to: 6, value: 8 },
-        { from: 5, to: 7, value: 2 },
-        { from: 4, to: 5, value: 1 },
-        { from: 9, to: 10, value: 2 },
-        { from: 2, to: 3, value: 6 },
-        { from: 3, to: 9, value: 4 },
-        { from: 5, to: 3, value: 1 },
-        { from: 2, to: 7, value: 4 },
-        { from: 2, to: 2, value: 2 },
-        { from: 4, to: 2, value: 3 },
-      ]
+    nodes,
+    edges
   };
 
   const options = {
@@ -98,10 +89,11 @@ function graphVis() {
       font: {
         size: 14,
       },
-      borderWidth: 2, 
-  color: {
-    border: "yellow", 
-  },
+      borderWidth: 7,
+      color: {
+        border: "yellow",
+        background: 'grey',
+      },
     },
     edges: {
       arrows: {
@@ -109,38 +101,71 @@ function graphVis() {
           enabled: true,
           scaleFactor: 1,
           type: "arrow",
-          color: "green", // Couleur de la flèche sortante
+          color: "green",
         },
         from: {
-        
           scaleFactor: 1,
           type: "arrow",
-          color: "red", // Couleur de la flèche entrante
+          color: "red",
         },
-        },
-        shadow: false,
+      },
+      shadow: false,
     },
     interaction: {
       hover: true,
     },
-    height: "700px",
-    width: "900px"
+    physics: {
+      stabilization: {
+        enabled: true,
+        iterations: 1000,
+        fit: true,
+      },
+    },
+    configure: {
+      enabled: false,
+    },
+    height: "800px",
+    width: "1200px",
+  };
+
+  const handleNodeClick = (event) => {
+    const { nodes } = event;
+    console.log(nodes[0], "blabla")
+    if (nodes.length > 0) {
+      const clickedNodeId = nodes[0];
+      const clickedNode = nodes.find(node => node.id === clickedNodeId);
+      if (clickedNode) {
+        setDialogContent(`Contenu du nœud ${clickedNode.id}: ${clickedNode.title}`);
+        setOpenDialog(true);
+      }
+    }
+  };
+
+ 
+  
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
   };
 
   const events = {
-    select: function(event) {
-      var { nodes, edges } = event;
-    }
+    click: handleNodeClick,
   };
+
   return (
-    <Graph
-      graph={graph}
-      options={options}
-      events={events}
-    //   getNetwork={network => {
-       
-    //   }}
-    />
+    <div>
+      <Graph graph={graph} options={options} events={events} />
+
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>Popup de Nœud</DialogTitle>
+        <DialogContent>
+          <DialogContentText>{dialogContent}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}>Fermer</Button>
+        </DialogActions>
+      </Dialog>
+    </div>
   );
 }
-export default graphVis;
+
+export default GraphVis;
